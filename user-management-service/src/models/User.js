@@ -22,14 +22,6 @@ const UserSchema = new Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
-// Hash the password before saving the user model
-UserSchema.pre('save', function (next) {
-  if (this.isModified('password')) {
-    this.password = bcrypt.hashSync(this.password, 10);
-  }
-  next();
-});
-
 const User = mongoose.model('User', UserSchema);
 
 module.exports = User;

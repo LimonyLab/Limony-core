@@ -18,11 +18,9 @@ exports.register = async (req, res) => {
           // Create and save the user
           user = new User(req.body);
 
-          logger.info('Received a request to register the following user:');
-          logger.info(user);
-
           user.password = await bcrypt.hash(user.password, 10);
           logger.info(`Newly hashed password: ${await user.password}`)
+          //user.save();
           await user.save();
           logger.info(`User registered: ${user.email}`);
           return res.status(201).json({ email: user.email, message: 'User registered successfully.' });
@@ -45,16 +43,8 @@ exports.login = async (req, res) => {
   logger.info('Received a req to the login api.')
   try {
     const user = await User.findOne({ email: req.body.email });
-    logger.info(`user: ${user}`)
-
     if (!user) return res.status(400).json({ msg: 'User Not Exist' });
-
     const isMatch = await bcrypt.compare(req.body.password, user.password);
-    logger.info(`isMatch: ${isMatch}`)
-    //logger.info(`Right now hashed of 123: ${await bcrypt.hash(req.body.password, 10)}`)
-    logger.info(`req.body.password: ${req.body.password}`)
-    logger.info(`user.password: ${user.password}`)
-
     if (!isMatch) return res.status(400).json({ msg: 'Incorrect Password!' });
 
     
