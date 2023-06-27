@@ -62,12 +62,21 @@ exports.login = async (req, res) => {
         expiresIn: 3600,
       },
       (err, token) => {
-        if (err) throw err;
+        if (err) {
+          logger.error("Error signing the token", err);
+          return res.status(500).json({ message: 'Could not log in' });
+        }
         res.status(200).json({
           token,
+          user: {
+            id: user.id,
+            // add any other user properties you need here
+          }
         });
       }
     );
+    
+
   } catch (e) {
     logger.error(e.message);
     res.status(500).json({ message: 'Server Error' });
