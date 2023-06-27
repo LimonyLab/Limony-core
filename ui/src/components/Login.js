@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -7,8 +7,11 @@ import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import Alert from '@mui/material/Alert';
+import { AuthContext } from '../context/auth';
+
 
 const Login = () => {
+    const { setAuthToken, setCurrentUser, login } = useContext(AuthContext);
     const [form, setForm] = useState({
         email: "",
         password: ""
@@ -25,17 +28,21 @@ const Login = () => {
         }));
     };
 
-    const handleSubmit = async (event) => {
+    const handleSubmit = (event) => {
         event.preventDefault();
-        try {
-            const response = await axios.post("http://localhost:3000/users/login", form);
+    
+        login(form.email, form.password)
+          .then(() => {
             setSuccessMessage("Login successful!");
-            console.log(response.data); // You might want to do something with the response, like setting user data
-        } catch (error) {
+            console.log('58 in Login.js')
+          })
+          .catch((error) => {
             setErrorMessage("Login failed!");
+            console.log('62 in Login.js')
             console.error(error);
-        }
+          });
     };
+    
 
     const successAlert = successMessage ? <Alert severity="success">{successMessage}</Alert> : null;
     const errorAlert = errorMessage ? <Alert severity="error">{errorMessage}</Alert> : null;
