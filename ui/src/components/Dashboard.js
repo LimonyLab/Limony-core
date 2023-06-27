@@ -3,20 +3,23 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/auth';
 
 const Dashboard = () => {
-  const { user } = useAuth();
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!user) {
-      navigate('/login');
+    const { currentUser } = useAuth();
+
+    useEffect(() => {
+    if (!currentUser) {
+        navigate('/login');
     }
-  }, [user, navigate]);
+    }, [currentUser, navigate]);
 
-  return (
-    <div>
-      {/* Your dashboard content */}
-    </div>
-  );
+
+
+    return (
+        <div>
+        {/* Your dashboard content */}
+        </div>
+    );
 };
 
 export default Dashboard;

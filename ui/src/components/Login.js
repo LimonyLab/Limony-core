@@ -7,6 +7,7 @@ import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import Alert from '@mui/material/Alert';
+import { useNavigate } from 'react-router-dom'; // add this line
 import { AuthContext } from '../context/auth';
 
 
@@ -19,6 +20,8 @@ const Login = () => {
 
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
+
+    const navigate = useNavigate(); // add this line
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -34,11 +37,10 @@ const Login = () => {
         login(form.email, form.password)
           .then(() => {
             setSuccessMessage("Login successful!");
-            console.log('58 in Login.js')
+            navigate('/dashboard'); // add this line
           })
           .catch((error) => {
             setErrorMessage("Login failed!");
-            console.log('62 in Login.js')
             console.error(error);
           });
     };

@@ -8,9 +8,10 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }) {
-  const [currentUser, setCurrentUser] = useState(null);
+  const storedUser = localStorage.getItem('user');
+  const [currentUser, setCurrentUser] = useState(storedUser ? JSON.parse(storedUser) : null);
   const [authToken, setAuthToken] = useState(localStorage.getItem('jwtToken'));
-
+  
   const login = (email, password) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -19,6 +20,7 @@ export function AuthProvider({ children }) {
             // Set auth token in local storage and context
             const { token, user } = response.data; // Assuming user data is also returned
             localStorage.setItem("jwtToken", token);
+            localStorage.setItem("user", JSON.stringify(user)); // store user data
             setAuthToken(token);
             setCurrentUser(user); // set user data in context
             resolve();
@@ -28,6 +30,8 @@ export function AuthProvider({ children }) {
         }
     });
   };
+
+
 
 
   const value = {
