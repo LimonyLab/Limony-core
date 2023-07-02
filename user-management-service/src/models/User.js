@@ -6,6 +6,7 @@ const UserSchema = new Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true }, 
   role: { type: String, default: 'employee' }, 
+  conversationId: { type: String },
   profile: {
     name: { type: String, required: true },
     age: { type: Number, required: true },

@@ -106,6 +106,10 @@ const Register = () => {
 
     return (
         <Container component="main" maxWidth="xs">
+            <Typography variant="h6" color="textSecondary" align="center" style={{ marginTop: '4em', marginBottom: '2em' }} gutterBottom>
+                Please register using the email you would like to receive recommendations on.
+            </Typography>
+            
         <Paper elevation={3} style={{ padding: 16, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Typography component="h1" variant="h5">
                 Register

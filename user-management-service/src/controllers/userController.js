@@ -23,6 +23,20 @@ exports.register = async (req, res) => {
           //user.save();
           await user.save();
           logger.info(`User registered: ${user.email}`);
+
+
+          // Create a new conversation when a user registers
+          const conversation = new Conversation({
+            messages: [],
+            userId: user._id
+          });
+          await conversation.save();
+
+          // Store the conversation ID in the user's document
+          user.conversationId = conversation._id;
+          await user.save();
+
+
           return res.status(201).json({ email: user.email, message: 'User registered successfully.' });
         }
       })
