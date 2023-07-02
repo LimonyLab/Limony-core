@@ -4,7 +4,8 @@ const { Schema } = mongoose;
 
 const UserSchema = new Schema({
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true }, // Remember to hash the password before storing
+  password: { type: String, required: true }, 
+  role: { type: String, default: 'employee' }, 
   profile: {
     name: { type: String, required: true },
     age: { type: Number, required: true },
