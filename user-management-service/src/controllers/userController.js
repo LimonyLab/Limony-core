@@ -43,7 +43,7 @@ exports.register = async (req, res) => {
 
 
           const email = {
-            from: 'noreply@yourapp.com',
+            from: 'LimonyAssistant@gmail.com',
             to: user.email,
             subject: 'Welcome to Our App!',
             html: `
@@ -53,7 +53,7 @@ exports.register = async (req, res) => {
             `,
           };
           
-          console.log(54);
+
           // Send a welcome email to the newly created user. 
           axios.post('http://localhost:3002/enqueue-email', email)
           .then((response) => {
@@ -63,7 +63,7 @@ exports.register = async (req, res) => {
             console.error('Error enqueueing email: ', error);
           });
 
-          console.log(64);
+          
           return res.status(201).json({ email: user.email, message: 'User registered successfully.' });
         }
       })
