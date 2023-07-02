@@ -1,7 +1,10 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Conversation = require('../models/Conversation');
 const logger = require('../utils/logger');
+const axios = require('axios');
+
 
 // Set this as an environment variable in production
 const SECRET_KEY = '123456789';
@@ -15,6 +18,7 @@ exports.register = async (req, res) => {
         if (user) {
           return res.status(400).json({ message: 'Email already exists' });
         } else {
+          console.log(19);
           // Create and save the user
           user = new User(req.body);
 
@@ -24,7 +28,7 @@ exports.register = async (req, res) => {
           await user.save();
           logger.info(`User registered: ${user.email}`);
 
-
+          console.log(29);
           // Create a new conversation when a user registers
           const conversation = new Conversation({
             messages: [],
@@ -35,8 +39,31 @@ exports.register = async (req, res) => {
           // Store the conversation ID in the user's document
           user.conversationId = conversation._id;
           await user.save();
+          
 
 
+          const email = {
+            from: 'noreply@yourapp.com',
+            to: user.email,
+            subject: 'Welcome to Our App!',
+            html: `
+              <p>Hello ${user.profile.name},</p>
+              <p>Thank you for registering at our app.</p>
+              <p>...</p>
+            `,
+          };
+          
+          console.log(54);
+          // Send a welcome email to the newly created user. 
+          axios.post('http://localhost:3002/enqueue-email', email)
+          .then((response) => {
+            console.log('Enqueued email: ', response.data);
+          })
+          .catch((error) => {
+            console.error('Error enqueueing email: ', error);
+          });
+
+          console.log(64);
           return res.status(201).json({ email: user.email, message: 'User registered successfully.' });
         }
       })
