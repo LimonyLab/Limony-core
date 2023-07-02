@@ -7,7 +7,7 @@ import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import Alert from '@mui/material/Alert';
-import { useNavigate } from 'react-router-dom'; // add this line
+import { useNavigate } from 'react-router-dom'; 
 import { AuthContext } from '../context/auth';
 
 
@@ -21,7 +21,7 @@ const Login = () => {
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
 
-    const navigate = useNavigate(); // add this line
+    const navigate = useNavigate(); 
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -37,7 +37,7 @@ const Login = () => {
         login(form.email, form.password)
           .then(() => {
             setSuccessMessage("Login successful!");
-            navigate('/dashboard'); // add this line
+            navigate('/dashboard'); 
           })
           .catch((error) => {
             setErrorMessage("Login failed!");
