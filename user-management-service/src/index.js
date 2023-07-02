@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const userController = require('./controllers/userController');
 const auth = require('./middleware/auth'); // import auth middleware
 const logger = require('./utils/logger');
+const userRoutes = require('./routes/userRoutes'); // import user routes
+const chatRoutes = require('./routes/chatRoutes'); // import chat routes
 var cors = require('cors');
 const app = express();
 const port = process.env.PORT || 3000;
@@ -21,12 +23,8 @@ db.once('open', function () {
 });
 
 app.use(express.json()); // for parsing application/json
-
-app.post('/users/register', userController.register);
-app.post('/users/login', userController.login);
-app.get('/users/profile', auth, userController.getProfile); // protected route
-app.put('/users/profile', auth, userController.updateProfile); // protected route
-app.delete('/users/profile', auth, userController.deleteProfile); // protected route
+app.use('/users', userRoutes); // use user routes
+app.use('/chat', chatRoutes); // use chat routes
 
 app.listen(port, () => {
   console.log(`User Management Service listening at http://localhost:${port}`);

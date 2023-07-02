@@ -1,22 +1,24 @@
-import React, { useEffect } from 'react';
-import { useAuth } from '../context/auth';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Button } from '@mui/material';
+import { useAuth } from '../context/auth';
+import Box from '@mui/material/Box';
+import ChatBox from './Chat/ChatBox';
 
-function Chat() {
-  const { user, logout } = useAuth();
+const Chat = () => {
   const navigate = useNavigate();
+  
+  const { currentUser } = useAuth();
+
+  console.log('currentUser is:::::: ', currentUser);
+  console.log('current user email is:::: ', currentUser.email);
 
   useEffect(() => {
-    if (!user) {
+  if (!currentUser) {
       navigate('/login');
-    }
-  }, [user, navigate]);
+  }
+  }, [currentUser, navigate]);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
+
 
   return (
     <Box
@@ -29,10 +31,12 @@ function Chat() {
       }}
     >
       <h1>Welcome to the Chat Page!</h1>
-      {user && <h2>Welcome, {user.email}!</h2>}
-      <Button variant="outlined" onClick={handleLogout}>Log out</Button>
+      {currentUser && <h2>Welcome, {currentUser.email}!</h2>}
+      <ChatBox /> {/* Include the ChatBox component in the render method */}
     </Box>
   );
-}
+};
+
+
 
 export default Chat;

@@ -27,10 +27,8 @@ app.listen(3002, () => {
 });
 
 app.post('/enqueue-email', (req, res) => {
-  console.log('23')
   const email = req.body;
   enqueueEmail(email); // From the emailQueue.js
-  console.log('26')
   res.json({ message: 'Email enqueued successfully.' });
 });
 
@@ -84,7 +82,7 @@ function sendNextEmail() {
 
 
   // Call the function again after a delay, regardless of whether an email was sent
-  setTimeout(sendNextEmail, 2000);  // Check for a new email every 5 seconds
+  setTimeout(sendNextEmail, 60000);  // Check for a new email every 5 seconds
 }
 
 // Start sending emails
