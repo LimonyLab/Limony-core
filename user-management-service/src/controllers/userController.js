@@ -79,7 +79,6 @@ exports.register = async (req, res) => {
 
 
 
-
 exports.login = async (req, res) => {
   logger.info('Received a req to the login api.')
   try {
@@ -87,8 +86,6 @@ exports.login = async (req, res) => {
     if (!user) return res.status(400).json({ msg: 'User Not Exist' });
     const isMatch = await bcrypt.compare(req.body.password, user.password);
     if (!isMatch) return res.status(400).json({ msg: 'Incorrect Password!' });
-
-    
 
     const payload = {
       user: {
@@ -102,11 +99,16 @@ exports.login = async (req, res) => {
       {
         expiresIn: 3600,
       },
-      (err, token) => {
+      async (err, token) => {
         if (err) {
           logger.error("Error signing the token", err);
           return res.status(500).json({ message: 'Could not log in' });
         }
+
+        // Store the token in the user's document
+        user.tokens = user.tokens.concat({ token });
+        await user.save();
+
         res.status(200).json({
           token,
           user: {
@@ -120,13 +122,13 @@ exports.login = async (req, res) => {
         });
       }
     );
-    
 
   } catch (e) {
     logger.error(e.message);
     res.status(500).json({ message: 'Server Error' });
   }
 };
+
 
 exports.getProfile = async (req, res) => {
   try {

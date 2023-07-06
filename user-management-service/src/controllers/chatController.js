@@ -3,15 +3,23 @@ const Conversation = require('../models/Conversation');
 exports.newMessage = async (req, res) => {
   const { content } = req.body;
   const sender = req.user.email; // extracting user email from auth middleware
-  
+
   try {
-    const message = new Message({
-      content,
+    let conversation = await Conversation.findOne({ userId: req.user._id });
+
+    if (!conversation) {
+      conversation = new Conversation({
+        userId: req.user._id,
+      });
+    }
+
+    conversation.messages.push({
       sender,
-      recipient: 'supervisor', // if supervisor is a specific email, replace it here
+      content: content,
+      recipient: 'supervisor'
     });
 
-    await message.save();
+    await conversation.save();
 
     res.status(200).json({
       message: 'Message sent successfully',
@@ -23,35 +31,45 @@ exports.newMessage = async (req, res) => {
   }
 };
 
-
 exports.getMessages = async (req, res) => {
-    const userId = req.user._id;
+  try {
+    const conversation = await Conversation.findOne({ userId: req.user._id });
 
-    // Retrieve the user's conversation from the Map
-    const userConversation = conversations.get(userId);
+    if (!conversation) {
+      return res.status(200).json({ conversation: [] });
+    }
 
-    res.status(200).json({ conversation: userConversation });
+    res.status(200).json({ conversation: conversation.messages });
+  } catch (error) {
+    res.status(500).json({ error: 'There was a server error' });
+  }
 };
 
-
 exports.sendMessage = async (req, res) => {
-    const { userId, message } = req.body;
-  
-    // Retrieve the user's conversation
-    const userConversation = conversations.get(userId) || [];
-  
-    // Add the supervisor's message to the user's conversation
-    userConversation.push({
+  const { userId, message } = req.body;
+
+  try {
+    let conversation = await Conversation.findOne({ userId });
+
+    if (!conversation) {
+      conversation = new Conversation({
+        userId,
+      });
+    }
+
+    conversation.messages.push({
       sender: 'supervisor',
       message,
       timestamp: new Date(),
     });
-  
-    // Update the conversation in the Map
-    conversations.set(userId, userConversation);
-  
+
+    await conversation.save();
+
     // Here, implement the logic to send the message to the user
     // You can use WebSocket, Server-Sent Events, etc.
-  
+
     res.status(200).json({ message: 'Message sent' });
-  };
+  } catch (error) {
+    res.status(500).json({ error: 'There was a server error' });
+  }
+};
