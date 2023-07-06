@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+//const bcrypt = require('bcryptjs');
 const { Schema } = mongoose;
 
 const UserSchema = new Schema({
@@ -10,7 +10,7 @@ const UserSchema = new Schema({
   profile: {
     name: { type: String, required: true },
     age: { type: Number, required: true },
-    // ...
+    // Let's add more fields to here later
   },
   healthInfo: {
     bloodPressure: {
@@ -18,7 +18,7 @@ const UserSchema = new Schema({
       diastolic: { type: Number },
     },
     overallHealthStatus: { type: String },
-    // ...
+    // Let's add more fields to here later
   },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },

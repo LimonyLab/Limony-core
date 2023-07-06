@@ -1,27 +1,28 @@
 const Conversation = require('../models/Conversation');
 
 exports.newMessage = async (req, res) => {
-    const userId = req.user._id;
-    const { message } = req.body;
-
-    // Retrieve the user's conversation
-    const userConversation = conversations.get(userId) || [];
-
-    // Add the new message to the user's conversation
-    userConversation.push({
-    sender: 'user',
-    message,
-    timestamp: new Date(),
+  const { content } = req.body;
+  const sender = req.user.email; // extracting user email from auth middleware
+  
+  try {
+    const message = new Message({
+      content,
+      sender,
+      recipient: 'supervisor', // if supervisor is a specific email, replace it here
     });
 
-    // Update the conversation in the Map
-    conversations.set(userId, userConversation);
+    await message.save();
 
-    // Here, implement the logic to send the message to the supervisor
-    // You can use WebSocket, Server-Sent Events, etc.
-
-    res.status(200).json({ message: 'Message sent' });
+    res.status(200).json({
+      message: 'Message sent successfully',
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: 'There was a server error',
+    });
+  }
 };
+
 
 exports.getMessages = async (req, res) => {
     const userId = req.user._id;
