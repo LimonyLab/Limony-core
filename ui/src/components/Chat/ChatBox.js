@@ -11,7 +11,7 @@ import styled from 'styled-components';
 const ChatContainer = styled.div`
   display: flex;
   flex-direction: column;
-  max-height: 80vh;
+  max-height: 280vh;
   overflow: auto;
   margin: 1em;
   padding: 1em;
@@ -48,7 +48,8 @@ function ChatBox() {
             }
             })
             .then(response => {
-                setMessages(response.data);
+                //console.log('#### The received messages are: ', response.data.conversation)
+                setMessages(response.data.conversation);
             })
             .catch(error => {
                 console.error('Error fetching messages: ', error);
@@ -73,7 +74,7 @@ function ChatBox() {
             const newMessage = {
               content: messageContent,
               sender: currentUser.email,
-              timestamp: new Date(), // added timestamp
+              createdAt: new Date(), // added timestamp
             };
             setMessages([...messages, newMessage]);
         })
@@ -83,7 +84,7 @@ function ChatBox() {
       };
       
 
-    
+    console.log("This is the exact messages: ", messages);
     return (
         <ChatContainer>
             <MessagesContainer>
