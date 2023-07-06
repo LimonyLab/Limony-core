@@ -57,10 +57,11 @@ function ChatBox() {
     
 
     const handleSend = (messageContent) => {
-        axios.post('http://localhost:3000/chat/send-message', 
+        console.log('Our authorization bearer token is: ', authToken);
+        axios.post('http://localhost:3000/chat/new-message', 
         {
             content: messageContent,
-            // Add other data like the sender and timestamp if necessary
+            sender: currentUser.email, // added sender field
         },
         {
             headers: {
@@ -69,12 +70,18 @@ function ChatBox() {
         })
         .then(response => {
             // You could optimistically add the new message to the UI here
-            setMessages([...messages, response.data]);
+            const newMessage = {
+              content: messageContent,
+              sender: currentUser.email,
+              timestamp: new Date(), // added timestamp
+            };
+            setMessages([...messages, newMessage]);
         })
         .catch(error => {
             console.error('Error sending message: ', error);
         });
-    };
+      };
+      
 
     
     return (
