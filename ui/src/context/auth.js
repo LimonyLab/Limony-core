@@ -13,24 +13,7 @@ export function AuthProvider({ children }) {
   console.log("This is the current user in auth.js::: ", JSON.stringify(currentUser));
   const [authToken, setAuthToken] = useState(localStorage.getItem('jwtToken'));
   
-  const login = (email, password) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const response = await axios.post("http://localhost:3000/users/login", { email, password });
-            console.log('auth.js, 18')
-            // Set auth token in local storage and context
-            const { token, user } = response.data; // Assuming user data is also returned
-            localStorage.setItem("jwtToken", token);
-            localStorage.setItem("user", JSON.stringify(user)); // store user data
-            setAuthToken(token);
-            setCurrentUser(user); // set user data in context
-            resolve();
-
-        } catch (error) {
-            reject(error);
-        }
-    });
-  };
+  
 
 
 
@@ -38,7 +21,6 @@ export function AuthProvider({ children }) {
   const value = {
     currentUser,
     setCurrentUser,
-    login,
     authToken,
     setAuthToken,
     // other functions as needed

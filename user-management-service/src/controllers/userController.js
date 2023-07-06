@@ -111,6 +111,10 @@ exports.login = async (req, res) => {
           token,
           user: {
             id: user.id,
+            email: user.email,
+            name: user.profile.name,
+            age: user.profile.age,
+            registered: user.createdAt
             // add any other user properties you need here
           }
         });
