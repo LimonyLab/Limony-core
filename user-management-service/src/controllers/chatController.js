@@ -6,13 +6,12 @@ exports.newMessage = async (req, res) => {
 
   try {
     let conversation = await Conversation.findOne({ userId: req.user._id });
-
     if (!conversation) {
       conversation = new Conversation({
         userId: req.user._id,
       });
     }
-
+    console.log(req.user);
     conversation.messages.push({
       sender,
       content: content,
@@ -73,3 +72,116 @@ exports.sendMessage = async (req, res) => {
     res.status(500).json({ error: 'There was a server error' });
   }
 };
+
+exports.getAllConversations = async (req, res) => {
+  // check if the role of the user is supervisor
+  if (req.user.role !== 'supervisor') {
+    return res.status(403).json({ message: 'Unauthorized' });
+  }
+
+  try {
+    const conversations = await Conversation.find()
+      .populate('userId', 'email -_id') // populate the email of the user
+      .lean() // convert mongoose document to JS object to allow adding the lastUpdated field
+      .exec(); // execute the query
+
+    // loop over conversations and add the lastUpdated field
+    conversations.forEach(conversation => {
+      console.log('This is the converation: ', conversation);
+      if (conversation.messages.length != 0) {
+        const lastMessage = conversation.messages[conversation.messages.length - 1];
+        conversation.lastUpdated = lastMessage.updatedAt;
+      }
+    });
+
+    res.status(200).json({ conversations });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'There was a server error' });
+  }
+};
+
+
+
+exports.getChatMetdata = async (req, res) => {
+  
+  try {
+    const { conversationId } = req.params;
+
+    // find conversation by its ID and populate user details
+    const conversation = await Conversation.findById(conversationId).populate('userId', 'email -_id');
+
+    if (!conversation) {
+      return res.status(404).json({ message: 'Conversation not found' });
+    }
+
+    // get the last message
+    const lastMessage = conversation.messages[conversation.messages.length - 1];
+
+    console.log('conversation id is: ', conversationId);
+    console.log('Returning this lastMessage: ', lastMessage.updatedAt);
+    console.log('- - - - - - - - - - - - - - - - - - - - - - - - -');
+    
+
+    // return the conversation details along with user's email and last update time
+    res.status(200).json({ 
+      _id: conversation._id,
+      email: conversation.userId.email,
+      lastUpdated: lastMessage.updatedAt
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'There was a server error' });
+  }
+};
+
+
+
+
+// New;
+
+exports.newMessageSupervisorChat = async (req, res) => {
+  const { content } = req.body;
+  const sender = req.user.email; // extracting user email from auth middleware
+  const { conversationId } = req.params; // get conversationId from URL parameters
+
+  try {
+    let conversation = await Conversation.findById(conversationId);
+    if (!conversation) {
+      return res.status(404).json({
+        error: 'Conversation not found',
+      });
+    }
+    conversation.messages.push({
+      sender,
+      content: content,
+      recipient: 'supervisor'
+    });
+
+    await conversation.save();
+
+    res.status(200).json({
+      message: 'Message sent successfully',
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: 'There was a server error',
+    });
+  }
+};
+
+exports.getMessagesSupervisorChat = async (req, res) => {
+  const { conversationId } = req.params; // get conversationId from URL parameters
+  try {
+    const conversation = await Conversation.findById(conversationId);
+
+    if (!conversation) {
+      return res.status(404).json({ error: 'Conversation not found' });
+    }
+
+    res.status(200).json({ conversation: conversation.messages });
+  } catch (error) {
+    res.status(500).json({ error: 'There was a server error' });
+  }
+};
+
+// other methods remain the same...

@@ -1,4 +1,4 @@
-// src/components/Chat/ChatBox.js
+// src/components/Chat/SupervisorChatBox.js
 import React, { useEffect, useState, useContext } from 'react';
 import MyMessage from './MyMessage';
 import SupervisorMessage from './SupervisorMessage';
@@ -24,7 +24,7 @@ const MessagesContainer = styled.div`
   overflow: auto;
 `;
 
-function ChatBox() {
+function SupervisorChatBox({ conversationId }) {
     const [messages, setMessages] = useState([]);
     const { authToken } = useContext(AuthContext);
 
@@ -41,7 +41,7 @@ function ChatBox() {
 
         
     useEffect(() => {
-        axios.get('http://localhost:3000/chat/get-messages', {
+        axios.get(`http://localhost:3000/chat/get-messages/${conversationId}`, {
             headers: {
                 'Authorization': `Bearer ${authToken}`
             }
@@ -58,7 +58,7 @@ function ChatBox() {
 
     const handleSend = (messageContent) => {
         console.log('Our authorization bearer token is: ', authToken);
-        axios.post('http://localhost:3000/chat/new-message', 
+        axios.post(`http://localhost:3000/chat/new-message/${conversationId}`, 
         {
             content: messageContent,
             sender: currentUser.email, // added sender field
@@ -80,8 +80,8 @@ function ChatBox() {
         .catch(error => {
             console.error('Error sending message: ', error);
         });
-      };
-      
+    };
+    
 
     console.log("This is the exact messages: ", messages);
     return (
@@ -93,10 +93,9 @@ function ChatBox() {
                     : <MyMessage key={index} {...message} />
                 )}
             </MessagesContainer>
-
             <SendMessageForm onSend={handleSend} />
       </ChatContainer>
     );
 }
 
-export default ChatBox;
+export default SupervisorChatBox;
