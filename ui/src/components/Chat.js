@@ -31,7 +31,6 @@ const Chat = () => {
         height: '100vh'
       }}
     >
-      <h1>Welcome to the Chat Page!</h1>
       {currentUser && <h2>Welcome, {currentUser.name}!</h2>}
       <ChatBox /> {/* Include the ChatBox component in the render method */}
     </Box>
