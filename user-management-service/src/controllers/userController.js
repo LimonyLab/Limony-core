@@ -116,7 +116,8 @@ exports.login = async (req, res) => {
             email: user.email,
             name: user.profile.name,
             age: user.profile.age,
-            registered: user.createdAt
+            registered: user.createdAt,
+            role: user.role
             // add any other user properties you need here
           }
         });
@@ -162,3 +163,4 @@ exports.deleteProfile = async (req, res) => {
     res.status(500).send('Server Error');
   }
 };
+
