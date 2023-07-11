@@ -9,7 +9,7 @@ var cors = require('cors');
 const app = express();
 const port = process.env.PORT || 3000;
 const http = require('http');
-const { wss } = require('./controllers/chatController');
+const { wss } = require('./controllers/websocketController');
 
 app.use(cors()); // use cors middleware
 
@@ -31,12 +31,12 @@ app.use('/chat', chatRoutes); // use chat routes
 const server = http.createServer(app);
 
 
-// Bind the WebSocket server to the HTTP server.
-server.on('upgrade', (request, socket, head) => {
-  wss.handleUpgrade(request, socket, head, (ws) => {
+server.on('upgrade', function upgrade(request, socket, head) {
+  wss.handleUpgrade(request, socket, head, function done(ws) {
     wss.emit('connection', ws, request);
   });
 });
+
 
 
 server.listen(port, () => {

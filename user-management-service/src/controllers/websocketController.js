@@ -2,14 +2,12 @@ const WebSocket = require('ws');
 const Conversation = require('../models/Conversation');
 
 
-// Websocket server functionality
-
 // Create a new WebSocket Server
-const wss = new WebSocket.Server({ noServer: true });
-
+const wss = new WebSocket.Server({ port: 3001 });
 
 
 let newMessageSupervisorChat = async (conversationId, content, sender) => {
+    console.log('newMessageSupervisorChat')
     try {
       let conversation = await Conversation.findById(conversationId);
       if (!conversation) {
@@ -36,11 +34,15 @@ let newMessageSupervisorChat = async (conversationId, content, sender) => {
 
 
 let handleDisconnect = (ws) => {
-// You might want to remove the user from any list of connected users here, or perform other clean-up tasks.
+    console.log('handleDisconnect')
+
+    // You might want to remove the user from any list of connected users here, or perform other clean-up tasks.
 };
 
 // Broadcast a message to all connected users
 let broadcastMessage = (message) => {
+    console.log('broadcastMessage')
+
     wss.clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {
         client.send(message);
@@ -50,12 +52,16 @@ let broadcastMessage = (message) => {
 
 // Handle errors on the websocket connection
 let handleError = (error) => {
+    console.log('handleError')
+
     // Log the error, send an error message to connected users, or perform other error-handling tasks.
 };
 
 wss.on('connection', (ws, req) => {
-    // On initial connection, you can do any setup here, such as saving the ws connection to the request user.
-    const { conversationId } = req.params;
+
+    // Extract conversationId from URL
+    const url = new URL(req.url, `http://${req.headers.host}`);
+    const conversationId = url.searchParams.get('conversationId');
     
     ws.on('message', async (message) => {
       const { content, sender } = JSON.parse(message);
