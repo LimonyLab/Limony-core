@@ -8,6 +8,8 @@ const chatRoutes = require('./routes/chatRoutes'); // import chat routes
 var cors = require('cors');
 const app = express();
 const port = process.env.PORT || 3000;
+const http = require('http');
+const { wss } = require('./controllers/chatController');
 
 app.use(cors()); // use cors middleware
 
@@ -26,6 +28,17 @@ app.use(express.json()); // for parsing application/json
 app.use('/users', userRoutes); // use user routes
 app.use('/chat', chatRoutes); // use chat routes
 
-app.listen(port, () => {
-  console.log(`User Management Service listening at http://localhost:${port}`);
+const server = http.createServer(app);
+
+
+// Bind the WebSocket server to the HTTP server.
+server.on('upgrade', (request, socket, head) => {
+  wss.handleUpgrade(request, socket, head, (ws) => {
+    wss.emit('connection', ws, request);
+  });
+});
+
+
+server.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
