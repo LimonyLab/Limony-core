@@ -1,6 +1,53 @@
 const Conversation = require('../models/Conversation');
+const WebSocket = require('ws');
 
-exports.newMessage = async (req, res) => {
+
+// Websocket server functionality
+
+// Create a new WebSocket Server
+const wss = new WebSocket.Server({ noServer: true });
+
+// Connection handling
+wss.on('connection', (ws, req) => {
+  // On initial connection, you can do any setup here, such as saving the ws connection to the request user.
+
+  ws.on('message', (message) => {
+    // Handle incoming messages from clients here.
+
+    // For example, you could parse the message, handle the command, and send a response:
+    const command = JSON.parse(message);
+    handleCommand(command, ws);
+  });
+
+  ws.on('close', () => {
+    // Handle closing connections here. You might want to clean up the saved ws connection for example.
+  });
+});
+
+
+let handleCommand = (command, ws) => {
+  // You can handle different types of commands from your client here. For example, you might have 'sendMessage' and 'receiveMessage' commands.
+
+  if (command.type === 'sendMessage') {
+    // You would handle your sendMessage logic here. This might involve saving the message to the database, and sending the message to the correct recipient.
+
+    // For example:
+    saveMessageToDatabase(command.message)
+      .then(() => {
+        sendMessageToRecipient(command.recipientId, command.message);
+      })
+      .catch((error) => {
+        // If an error occurs, send an error message back to the client.
+        ws.send(JSON.stringify({ type: 'error', error: error.toString() }));
+      });
+  }
+}
+
+
+
+// Ordinary server functionality
+
+let newMessage = async (req, res) => {
   const { content } = req.body;
   const sender = req.user.email; // extracting user email from auth middleware
 
@@ -30,7 +77,7 @@ exports.newMessage = async (req, res) => {
   }
 };
 
-exports.getMessages = async (req, res) => {
+let getMessages = async (req, res) => {
   try {
     const conversation = await Conversation.findOne({ userId: req.user._id });
 
@@ -44,7 +91,7 @@ exports.getMessages = async (req, res) => {
   }
 };
 
-exports.sendMessage = async (req, res) => {
+let sendMessage = async (req, res) => {
   const { userId, message } = req.body;
 
   try {
@@ -73,7 +120,7 @@ exports.sendMessage = async (req, res) => {
   }
 };
 
-exports.getAllConversations = async (req, res) => {
+let getAllConversations = async (req, res) => {
   // check if the role of the user is supervisor
   if (req.user.role !== 'supervisor') {
     return res.status(403).json({ message: 'Unauthorized' });
@@ -103,7 +150,7 @@ exports.getAllConversations = async (req, res) => {
 
 
 
-exports.getChatMetdata = async (req, res) => {
+let getChatMetdata = async (req, res) => {
   
   try {
     const { conversationId } = req.params;
@@ -137,9 +184,7 @@ exports.getChatMetdata = async (req, res) => {
 
 
 
-// New;
-
-exports.newMessageSupervisorChat = async (req, res) => {
+let newMessageSupervisorChat = async (req, res) => {
   const { content } = req.body;
   const sender = req.user.email; // extracting user email from auth middleware
   const { conversationId } = req.params; // get conversationId from URL parameters
@@ -169,7 +214,7 @@ exports.newMessageSupervisorChat = async (req, res) => {
   }
 };
 
-exports.getMessagesSupervisorChat = async (req, res) => {
+let getMessagesSupervisorChat = async (req, res) => {
   const { conversationId } = req.params; // get conversationId from URL parameters
   try {
     const conversation = await Conversation.findById(conversationId);
@@ -185,3 +230,17 @@ exports.getMessagesSupervisorChat = async (req, res) => {
 };
 
 // other methods remain the same...
+
+
+
+module.exports = {
+  wss,
+  newMessage,
+  getMessages,
+  sendMessage,
+  getAllConversations,
+  getChatMetdata,
+  newMessageSupervisorChat,
+  getMessagesSupervisorChat,
+  // Include any other functions you need to export.
+};
