@@ -1,48 +1,4 @@
 const Conversation = require('../models/Conversation');
-const WebSocket = require('ws');
-
-
-// Websocket server functionality
-
-// Create a new WebSocket Server
-const wss = new WebSocket.Server({ noServer: true });
-
-// Connection handling
-wss.on('connection', (ws, req) => {
-  // On initial connection, you can do any setup here, such as saving the ws connection to the request user.
-
-  ws.on('message', (message) => {
-    // Handle incoming messages from clients here.
-
-    // For example, you could parse the message, handle the command, and send a response:
-    const command = JSON.parse(message);
-    handleCommand(command, ws);
-  });
-
-  ws.on('close', () => {
-    // Handle closing connections here. You might want to clean up the saved ws connection for example.
-  });
-});
-
-
-let handleCommand = (command, ws) => {
-  // You can handle different types of commands from your client here. For example, you might have 'sendMessage' and 'receiveMessage' commands.
-
-  if (command.type === 'sendMessage') {
-    // You would handle your sendMessage logic here. This might involve saving the message to the database, and sending the message to the correct recipient.
-
-    // For example:
-    saveMessageToDatabase(command.message)
-      .then(() => {
-        sendMessageToRecipient(command.recipientId, command.message);
-      })
-      .catch((error) => {
-        // If an error occurs, send an error message back to the client.
-        ws.send(JSON.stringify({ type: 'error', error: error.toString() }));
-      });
-  }
-}
-
 
 
 // Ordinary server functionality
@@ -234,7 +190,6 @@ let getMessagesSupervisorChat = async (req, res) => {
 
 
 module.exports = {
-  wss,
   newMessage,
   getMessages,
   sendMessage,
@@ -242,5 +197,4 @@ module.exports = {
   getChatMetdata,
   newMessageSupervisorChat,
   getMessagesSupervisorChat,
-  // Include any other functions you need to export.
 };

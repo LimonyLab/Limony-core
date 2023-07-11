@@ -25,6 +25,7 @@ const MessagesContainer = styled.div`
 `;
 
 function SupervisorChatBox({ conversationId }) {
+    const [ws, setWs] = useState(null);
     const [messages, setMessages] = useState([]);
     const { authToken } = useContext(AuthContext);
 
@@ -58,7 +59,7 @@ function SupervisorChatBox({ conversationId }) {
     }, []);
 
     useEffect(scrollToBottom, [messages]); // Call scrollToBottom each time messages updates
-
+    
     const handleSend = (messageContent) => {
         console.log('Our authorization bearer token is: ', authToken);
         axios.post(`http://localhost:3000/chat/new-message/${conversationId}`, 
@@ -83,7 +84,11 @@ function SupervisorChatBox({ conversationId }) {
             console.error('Error sending message: ', error);
         });
     };
-    
+
+
+  
+
+
 
     console.log("This is the exact messages: ", messages);
     return (
