@@ -29,14 +29,34 @@ app.use('/users', userRoutes); // use user routes
 app.use('/chat', chatRoutes); // use chat routes
 
 const server = http.createServer(app);
+/*
+server.on('upgrade', function upgrade(request, socket, head) {
+  const pathname = url.parse(request.url).pathname;
+
+  if (pathname === '/chat-socket') {
+    wss.handleUpgrade(request, socket, head, function done(ws) {
+      wss.emit('connection', ws, request);
+    });
+  } else {
+    socket.destroy();
+  }
+});
+*/
+
 
 
 server.on('upgrade', function upgrade(request, socket, head) {
-  wss.handleUpgrade(request, socket, head, function done(ws) {
-    wss.emit('connection', ws, request);
-  });
-});
+  const url = require('url');
+  const pathname = url.parse(request.url).pathname;
 
+  if (pathname === '/chat-socket') {
+    wss.handleUpgrade(request, socket, head, function done(ws) {
+      wss.emit('connection', ws, request);
+    });
+  } else {
+    socket.destroy();
+  }
+});
 
 
 server.listen(port, () => {

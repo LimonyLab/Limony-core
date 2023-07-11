@@ -3,8 +3,7 @@ const Conversation = require('../models/Conversation');
 
 
 // Create a new WebSocket Server
-const wss = new WebSocket.Server({ port: 3001 });
-
+const wss = new WebSocket.Server({ noServer: true });
 
 let newMessageSupervisorChat = async (conversationId, content, sender) => {
     console.log('newMessageSupervisorChat')
@@ -61,6 +60,7 @@ wss.on('connection', (ws, req) => {
 
     // Extract conversationId from URL
     const url = new URL(req.url, `http://${req.headers.host}`);
+    console.log('This is the URL: ', url);
     const conversationId = url.searchParams.get('conversationId');
     
     ws.on('message', async (message) => {

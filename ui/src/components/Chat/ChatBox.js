@@ -1,5 +1,5 @@
 // src/components/Chat/ChatBox.js
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import MyMessage from './MyMessage';
 import SupervisorMessage from './SupervisorMessage';
 import SendMessageForm from './SendMessageForm';
@@ -37,7 +37,11 @@ function ChatBox() {
     }
     }, [currentUser, navigate]);
 
+    const messagesEndRef = useRef(null)
 
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    }
 
         
     useEffect(() => {
@@ -54,6 +58,9 @@ function ChatBox() {
                 console.error('Error fetching messages: ', error);
             });
     }, []);
+
+    useEffect(scrollToBottom, [messages]);
+
     
 
     const handleSend = (messageContent) => {
@@ -92,6 +99,7 @@ function ChatBox() {
                     ? <SupervisorMessage key={index} {...message} />
                     : <MyMessage key={index} {...message} />
                 )}
+                <div ref={messagesEndRef} />
             </MessagesContainer>
 
             <SendMessageForm onSend={handleSend} />
