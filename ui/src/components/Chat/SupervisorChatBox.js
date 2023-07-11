@@ -1,10 +1,10 @@
 // src/components/Chat/SupervisorChatBox.js
-import React, { useEffect, useState, useContext, useRef } from 'react'; // Import useRef
+import React, { useEffect, useState, useRef, useContext } from 'react';
 import MyMessage from './MyMessage';
 import SupervisorMessage from './SupervisorMessage';
 import SendMessageForm from './SendMessageForm';
 import axios from 'axios';
-import { AuthProvider, AuthContext } from '../../context/auth';
+import { AuthContext } from '../../context/auth';
 import { useAuth } from '../../context/auth';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -24,86 +24,73 @@ const MessagesContainer = styled.div`
   overflow: auto;
 `;
 
+
 function SupervisorChatBox({ conversationId }) {
     const [ws, setWs] = useState(null);
     const [messages, setMessages] = useState([]);
     const { authToken } = useContext(AuthContext);
-
+  
     const navigate = useNavigate();
     const { currentUser } = useAuth();
-    
-    const messagesEndRef = useRef(null) // Create a ref
-
-    const scrollToBottom = () => { // Function to scroll to the bottom
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-    }
-
-    useEffect(() => {
-        if (!currentUser) {
-            navigate('/login');
-        }
-    }, [currentUser, navigate]);
-
-    useEffect(() => {
-        axios.get(`http://localhost:3000/chat/get-messages/${conversationId}`, {
-            headers: {
-                'Authorization': `Bearer ${authToken}`
-            }
-            })
-            .then(response => {
-                setMessages(response.data.conversation);
-            })
-            .catch(error => {
-                console.error('Error fetching messages: ', error);
-            });
-    }, []);
-
-    useEffect(scrollToBottom, [messages]); // Call scrollToBottom each time messages updates
-    
-    const handleSend = (messageContent) => {
-        console.log('Our authorization bearer token is: ', authToken);
-        axios.post(`http://localhost:3000/chat/new-message/${conversationId}`, 
-        {
-            content: messageContent,
-            sender: currentUser.email,
-        },
-        {
-            headers: {
-                'Authorization': `Bearer ${authToken}`
-            }
-        })
-        .then(response => {
-            const newMessage = {
-              content: messageContent,
-              sender: currentUser.email,
-              createdAt: new Date(),
-            };
-            setMessages([...messages, newMessage]);
-        })
-        .catch(error => {
-            console.error('Error sending message: ', error);
-        });
-    };
-
-
   
+    const messagesEndRef = useRef(null)
+  
+    const scrollToBottom = () => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    }
+  
+    useEffect(() => {
+      if (!currentUser) {
+        navigate('/login');
+      }
+    }, [currentUser, navigate]);
+  
+    // Add useEffect to establish WebSocket connection when the component mounts
+    useEffect(() => {
+        const wsConnection = new WebSocket(`ws://localhost:3000/chat?conversationId=${conversationId}`);      
+        wsConnection.onopen = () => console.log('connected to websocket');
+        wsConnection.onmessage = (message) => {
+        const data = JSON.parse(message.data);
+        setMessages(prev => [...prev, data]);
+        };
+        setWs(wsConnection);
+        return () => {
+            wsConnection.close();
+        };
 
-
-
-    console.log("This is the exact messages: ", messages);
+    }, [conversationId]);
+  
+    useEffect(scrollToBottom, [messages]);
+  
+    const handleSend = (messageContent) => {
+      console.log('Our authorization bearer token is: ', authToken);
+  
+      const newMessage = {
+        content: messageContent,
+        sender: currentUser.email,
+        createdAt: new Date(),
+      };
+  
+      // Send the new message over the WebSocket
+      ws.send(JSON.stringify(newMessage));
+  
+      // Optimistically add the new message to the state
+      setMessages(prev => [...prev, newMessage]);
+    };
+  
     return (
-        <ChatContainer>
-            <MessagesContainer>
-                {messages.map((message, index) => 
-                    message.sender === 'supervisor@supervisor.com'
-                    ? <SupervisorMessage key={index} {...message} />
-                    : <MyMessage key={index} {...message} />
-                )}
-                <div ref={messagesEndRef} /> {/* Add a ref to an empty div at the end of messages */}
-            </MessagesContainer>
-            <SendMessageForm onSend={handleSend} />
+      <ChatContainer>
+        <MessagesContainer>
+          {messages.map((message, index) =>
+            message.sender === 'supervisor@supervisor.com'
+              ? <SupervisorMessage key={index} {...message} />
+              : <MyMessage key={index} {...message} />
+          )}
+          <div ref={messagesEndRef} />
+        </MessagesContainer>
+        <SendMessageForm onSend={handleSend} />
       </ChatContainer>
     );
-}
-
+  }
+  
 export default SupervisorChatBox;
