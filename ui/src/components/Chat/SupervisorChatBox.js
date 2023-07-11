@@ -38,6 +38,20 @@ function SupervisorChatBox({ conversationId }) {
     const scrollToBottom = () => {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
     }
+
+    useEffect(() => {
+        axios.get(`http://localhost:3000/chat/get-messages/${conversationId}`, {
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+            })
+            .then(response => {
+                setMessages(response.data.conversation);
+            })
+            .catch(error => {
+                console.error('Error fetching messages: ', error);
+            });
+    }, [conversationId, authToken]);
   
     useEffect(() => {
       if (!currentUser) {
@@ -47,7 +61,7 @@ function SupervisorChatBox({ conversationId }) {
   
     // Add useEffect to establish WebSocket connection when the component mounts
     useEffect(() => {
-        const wsConnection = new WebSocket(`ws://localhost:3000/chat?conversationId=${conversationId}`);      
+        const wsConnection = new WebSocket(`ws://localhost:3000/chat-socket?conversationId=${conversationId}`);      
         wsConnection.onopen = () => console.log('connected to websocket');
         wsConnection.onmessage = (message) => {
         const data = JSON.parse(message.data);
