@@ -6,7 +6,6 @@ const Conversation = require('../models/Conversation');
 const wss = new WebSocket.Server({ noServer: true });
 
 let newMessageSupervisorChat = async (conversationId, content, sender) => {
-    console.log('newMessageSupervisorChat')
     try {
       let conversation = await Conversation.findById(conversationId);
       if (!conversation) {
