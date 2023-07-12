@@ -139,7 +139,7 @@ let getChatMetdata = async (req, res) => {
 
 
 
-
+// Supervisor functionality
 let newMessageSupervisorChat = async (req, res) => {
   const { content } = req.body;
   const sender = req.user.email; // extracting user email from auth middleware
@@ -185,7 +185,42 @@ let getMessagesSupervisorChat = async (req, res) => {
   }
 };
 
-// other methods remain the same...
+
+
+
+// Combining newMessage and newMessageSupervisorChat controllers
+let newMessage_ = async (req, res) => {
+  const { content } = req.body;
+  const sender = req.user.email; // extracting user email from auth middleware
+  const { conversationId } = req.params; // get conversationId from URL parameters
+
+  // First we need to make sure the user is authorized to use this route. 
+
+  try {
+    let conversation = await Conversation.findById(conversationId);
+    if (!conversation) {
+      return res.status(404).json({
+        error: 'Conversation not found',
+      });
+    }
+    conversation.messages.push({
+      sender,
+      content: content,
+      recipient: 'supervisor'
+    });
+
+    await conversation.save();
+
+    res.status(200).json({
+      message: 'Message sent successfully',
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: 'There was a server error',
+    });
+  }
+};
+
 
 
 
