@@ -2,6 +2,9 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const logger = require('../utils/logger');
 
+const path = require('path');
+const Conversation = require('../models/Conversation');
+
 // Set this as an environment variable in production
 const SECRET_KEY = '123456789';
 
@@ -15,7 +18,26 @@ const SECRET_KEY = '123456789';
  * by every logged-in user) 2. The role has access to the path, but, the exact user is not authorized to access to that exact resource (user 1 cannot
  *  access user 2's chat page via /chat/conversationId; or, 'employee' role-holding users cannot access /chat/supervisor-panel, ).     
  */
+let rolePermissions = {
+  'supervisor': ['/supervisor-panel/', '/chat/', '/dashboard/'],
+  'employee': ['/chat/', '/dashboard/']
+}
 
+
+// Reverse mapping from route to roles
+let routesToRoles = {};
+for (const role in rolePermissions) {
+  rolePermissions[role].forEach(route => {
+    if (!routesToRoles[route]) {
+      routesToRoles[route] = [];
+    }
+    routesToRoles[route].push(role);
+  });
+}
+
+
+
+// The most basic auth middleware checking if the user is logged in
 const auth = async (req, res, next) => {
   //console.log('The request is: ', req);
   const authHeader = req.header('Authorization');
@@ -47,4 +69,32 @@ const auth = async (req, res, next) => {
 };
 
 
-module.exports = auth;
+// Checking if the user role allows for accessing particular path or not
+const roleAuth = async (req, res, next) => {
+  const userRole = req.user.role;
+  const route = path.dirname(req.path);
+  if (!routesToRoles[route] || !routesToRoles[route].includes(userRole)) {
+    logger.error('Not authorized to access this resource');
+    return res.status(403).send({ error: 'Not authorized to access this resource' });
+  }
+  next();
+};
+
+
+// check if the exact conversation (with conversationId) has the same value for `userId` field as `currentUser._id`. 
+// If not, throw an exception. 
+const chatAuth = async (req, res, next) => {
+  const user = req.user;
+  const conversationId = req.params.conversationId;
+  const conversation = await Conversation.findById(conversationId);
+  
+  if (conversation.userId.toString() !== user._id.toString()) {
+    logger.error('Not authorized to access this chat');
+    return res.status(403).send({ error: 'Not authorized to access this chat' });
+  }
+  
+  next();
+};
+
+
+module.exports = { auth, roleAuth, chatAuth };

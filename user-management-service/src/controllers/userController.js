@@ -130,6 +130,9 @@ exports.login = async (req, res) => {
   }
 };
 
+exports.test = async (req, res) => {
+  return 0;
+}
 
 exports.getProfile = async (req, res) => {
   try {
