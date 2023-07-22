@@ -24,6 +24,8 @@ const MessagesContainer = styled.div`
   overflow: auto;
 `;
 
+let ws;
+
 function ChatBox() {
     const [messages, setMessages] = useState([]);
     const { authToken } = useContext(AuthContext);
@@ -42,6 +44,38 @@ function ChatBox() {
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
     }
+
+    
+    useEffect(() => {
+        // Create a new WebSocket connection when the component mounts
+        ws = new WebSocket(`ws://localhost:3000/chat-socket?conversationId=${currentUser._id}`);
+    
+        ws.onopen = () => {
+          // Connection is opened
+          console.log('WebSocket connection open');
+        };
+    
+        ws.onmessage = (message) => {
+          // Message is received
+          const newMessage = JSON.parse(message.data);
+          setMessages([...messages, newMessage]);
+        };
+    
+        ws.onerror = (error) => {
+          // Error occurred
+          console.error('WebSocket error: ', error);
+        };
+    
+        ws.onclose = () => {
+          // Connection is closed
+          console.log('WebSocket connection closed');
+        };
+    
+        return () => {
+          // Clean up the WebSocket connection when the component unmounts
+          ws.close();
+        };
+    }, []);
 
         
     useEffect(() => {
@@ -64,30 +98,22 @@ function ChatBox() {
     
 
     const handleSend = (messageContent) => {
-        console.log('Our authorization bearer token is: ', authToken);
-        axios.post('http://localhost:3000/chat/new-message', 
-        {
-            content: messageContent,
-            sender: currentUser.email, // added sender field
-        },
-        {
-            headers: {
-                'Authorization': `Bearer ${authToken}`
-            }
-        })
-        .then(response => {
-            // You could optimistically add the new message to the UI here
-            const newMessage = {
-              content: messageContent,
-              sender: currentUser.email,
-              createdAt: new Date(), // added timestamp
-            };
-            setMessages([...messages, newMessage]);
-        })
-        .catch(error => {
-            console.error('Error sending message: ', error);
-        });
-      };
+        // Sending a new message using the WebSocket connection
+        const message = {
+          content: messageContent,
+          sender: currentUser.email,
+        };
+        ws.send(JSON.stringify(message));
+    
+        // Optimistically adding the new message to the UI here
+        const newMessage = {
+          content: messageContent,
+          sender: currentUser.email,
+          createdAt: new Date(),
+        };
+        setMessages([...messages, newMessage]);
+    };
+    
       
 
     console.log("This is the exact messages: ", messages);

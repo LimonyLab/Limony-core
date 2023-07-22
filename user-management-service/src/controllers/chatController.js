@@ -77,12 +77,15 @@ let sendMessage = async (req, res) => {
 };
 
 let getAllConversations = async (req, res) => {
+  console.log("We are at line 80")
   // check if the role of the user is supervisor
   if (req.user.role !== 'supervisor') {
     return res.status(403).json({ message: 'Unauthorized' });
   }
 
   try {
+    console.log("We are at line 87")
+
     const conversations = await Conversation.find()
       .populate('userId', 'email -_id') // populate the email of the user
       .lean() // convert mongoose document to JS object to allow adding the lastUpdated field
@@ -90,19 +93,21 @@ let getAllConversations = async (req, res) => {
 
     // loop over conversations and add the lastUpdated field
     conversations.forEach(conversation => {
-      console.log('This is the converation: ', conversation);
       if (conversation.messages.length != 0) {
         const lastMessage = conversation.messages[conversation.messages.length - 1];
         conversation.lastUpdated = lastMessage.updatedAt;
       }
     });
 
-    res.status(200).json({ conversations });
+    console.log('We are at line 102');
+
+    return res.status(200).json({ conversations });
   } catch (error) {
+    console.log("We are at line 105")
     console.log(error);
-    res.status(500).json({ error: 'There was a server error' });
+    return res.status(500).json({ error: 'There was a server error' });
   }
-};
+};  
 
 
 
@@ -186,8 +191,6 @@ let getMessagesSupervisorChat = async (req, res) => {
 };
 
 
-
-
 // Combining newMessage and newMessageSupervisorChat controllers
 let newMessage_ = async (req, res) => {
   const { content } = req.body;
@@ -231,5 +234,5 @@ module.exports = {
   getAllConversations,
   getChatMetdata,
   newMessageSupervisorChat,
-  getMessagesSupervisorChat,
+  getMessagesSupervisorChat
 };
