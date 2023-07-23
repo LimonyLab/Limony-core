@@ -23,8 +23,7 @@ exports.register = async (req, res) => {
           user = new User(req.body);
 
           user.password = await bcrypt.hash(user.password, 10);
-          logger.info(`Newly hashed password: ${await user.password}`)
-          //user.save();
+          
           await user.save();
           logger.info(`User registered: ${user.email}`);
 
@@ -32,7 +31,8 @@ exports.register = async (req, res) => {
           // Create a new conversation when a user registers
           const conversation = new Conversation({
             messages: [],
-            userId: user._id
+            userId: user._id,
+            supervisorId: null
           });
           await conversation.save();
 

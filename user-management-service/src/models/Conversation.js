@@ -19,7 +19,8 @@ const MessageSchema = new mongoose.Schema({
 
 const ConversationSchema = new Schema({
   messages: [MessageSchema],
-  userId: { type: Schema.Types.ObjectId, ref: 'User' }
+  userId: { type: Schema.Types.ObjectId, ref: 'User' },
+  supervisorId: { type: Schema.Types.ObjectId, ref: 'User' }
 });
 
 const Conversation = mongoose.model('Conversation', ConversationSchema);
