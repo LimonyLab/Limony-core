@@ -89,9 +89,10 @@ wss.on('connection', (ws, req) => {
 
   // Store the conversation websocket in for the in conversationWebSockets if it does not already exist (for the specific userId)
   if (!conversationWebsockets.has(conversationId)) {
+
     let thisConversationWebsocketMap = new Map();
     thisConversationWebsocketMap.set(sender, ws);
-    conversationWebsockets.set(conversationId, thisConversationWebsocketMap);
+    conversationWebsockets.set(conversationId, thisConversationWebsocketMap); 
   } else {
     let thisConversationWebsocketMap = conversationWebsockets.get(conversationId);
     thisConversationWebsocketMap.set(sender, ws);
