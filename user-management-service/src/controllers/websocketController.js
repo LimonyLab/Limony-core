@@ -49,8 +49,19 @@ let handleDisconnect = (ws) => {
 
 
 let broadcastMessage = (conversationId, content, sender, receiver) => {
-  // TODO: implement this part for discerning between supervisor and user
   console.log(`# broadcasting > conversationId: ${conversationId}, content: ${content}, sender: ${sender}, receiver: ${receiver}`);
+  let thisConversationWebsocketMap = conversationWebsockets.get(conversationId);
+  for (let [user, ws] of thisConversationWebsocketMap.entries()) {
+    if (ws.readyState === WebSocket.OPEN && user !== sender && user === receiver) {
+      logger.info('ws.readyState === WebSocket.OPEN && user !== sender && user === receiver => Will broadcast the message')
+      ws.send(JSON.stringify({
+        conversationId,
+        content,
+        sender,
+        receiver,
+      }));
+    }
+  } 
 
 };
 
@@ -67,34 +78,32 @@ wss.on('connection', (ws, req) => {
   const sender = url.searchParams.get('sender');
   const receiver = url.searchParams.get('receiver');
 
-  // if receiver was empty string abort
+  // if receiver was empty string abort (this was a temporary fix, the problem is resolved now...)
   if (receiver === '""') {
     console.log('! receiver is empty string, aborting...')
     ws.close();
     return;
-  } else {
-    console.log('Proceeding to store the ws...')
-  }
+  } 
 
   const conversationId = url.searchParams.get('conversationId');
 
   // Store the conversation websocket in for the in conversationWebSockets if it does not already exist (for the specific userId)
   if (!conversationWebsockets.has(conversationId)) {
-    console.log('@ conversation is not stored at all from neither side...')
     let thisConversationWebsocketMap = new Map();
     thisConversationWebsocketMap.set(sender, ws);
     conversationWebsockets.set(conversationId, thisConversationWebsocketMap);
   } else {
-    console.log('@ conversation is stored ...')
     let thisConversationWebsocketMap = conversationWebsockets.get(conversationId);
     thisConversationWebsocketMap.set(sender, ws);
     conversationWebsockets.set(conversationId, thisConversationWebsocketMap);
   }
 
+
   ws.on('message', async (message) => {
     // We set the client-server (and vice versa) standard for message as content, sender, receiver
     const { conversationId, content, sender, receiver } = JSON.parse(message);
-    console.log('> conversationId, content, sender, receiver ', conversationId, content, sender, receiver)
+    console.log(`# New message received > conversationId: ${conversationId}, content: ${content}, sender: ${sender}, receiver: ${receiver}`);
+
     
 
     // Also, what are we doing with the first argument of newMessage?
