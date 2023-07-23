@@ -1,13 +1,14 @@
 const WebSocket = require('ws');
 const Conversation = require('../models/Conversation');
+const logger = require('../utils/logger');
 
-// Create a map to store all connections
-const connections = new Map();
+
+const conversationWebsockets = new Map();
 
 // Create a new WebSocket Server
 const wss = new WebSocket.Server({ noServer: true });
 
-let newMessageSupervisorChat = async (conversationId, content, sender) => {
+let newMessage = async (conversationId, content, sender, receiver) => {
     try {
       let conversation = await Conversation.findById(conversationId);
       if (!conversation) {
@@ -32,29 +33,26 @@ let newMessageSupervisorChat = async (conversationId, content, sender) => {
     }
 };
 
-
-
 let handleDisconnect = (ws) => {
   // Find the user associated with the connection and delete it
+  // Following should be updated heavily to use the current design 
+  /*
   for(let [conversationId, websocket] of connections.entries()) {
     if(ws === websocket) {
       connections.delete(conversationId);
       break;
     }
   }
+  */
 };
 
 
-let broadcastMessage = (conversationId, message) => {
-  // Find the user's connection
-  const ws = connections.get(conversationId);
 
-  // If the connection exists and is open, send the message
-  if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify(message));
-  }
+let broadcastMessage = (conversationId, content, sender, receiver) => {
+  // TODO: implement this part for discerning between supervisor and user
+  console.log(`# broadcasting > conversationId: ${conversationId}, content: ${content}, sender: ${sender}, receiver: ${receiver}`);
+
 };
-
 
 // Handle errors on the websocket connection
 let handleError = (error) => {
@@ -63,25 +61,53 @@ let handleError = (error) => {
     // Log the error, send an error message to connected users, or perform other error-handling tasks.
 };
 
-
 wss.on('connection', (ws, req) => {
-  // Extract conversationId from URL
+  logger.info('websocketController.js, New WebSocket connection request is received');
   const url = new URL(req.url, `http://${req.headers.host}`);
+  const sender = url.searchParams.get('sender');
+  const receiver = url.searchParams.get('receiver');
+
+  // if receiver was empty string abort
+  if (receiver === '""') {
+    console.log('! receiver is empty string, aborting...')
+    ws.close();
+    return;
+  } else {
+    console.log('Proceeding to store the ws...')
+  }
+
   const conversationId = url.searchParams.get('conversationId');
 
-  // Store this connection
-  connections.set(conversationId, ws);
+  // Store the conversation websocket in for the in conversationWebSockets if it does not already exist (for the specific userId)
+  if (!conversationWebsockets.has(conversationId)) {
+    console.log('@ conversation is not stored at all from neither side...')
+    let thisConversationWebsocketMap = new Map();
+    thisConversationWebsocketMap.set(sender, ws);
+    conversationWebsockets.set(conversationId, thisConversationWebsocketMap);
+  } else {
+    console.log('@ conversation is stored ...')
+    let thisConversationWebsocketMap = conversationWebsockets.get(conversationId);
+    thisConversationWebsocketMap.set(sender, ws);
+    conversationWebsockets.set(conversationId, thisConversationWebsocketMap);
+  }
 
   ws.on('message', async (message) => {
-    const { content, sender } = JSON.parse(message);
-    await newMessageSupervisorChat(conversationId, content, sender);
+    // We set the client-server (and vice versa) standard for message as content, sender, receiver
+    const { conversationId, content, sender, receiver } = JSON.parse(message);
+    console.log('> conversationId, content, sender, receiver ', conversationId, content, sender, receiver)
+    
 
-    // Now, broadcast the message to the user
-    broadcastMessage(conversationId, { sender, content });
+    // Also, what are we doing with the first argument of newMessage?
+    await newMessage(conversationId, content, sender, receiver);
+
+    // Now, broadcast the message
+    broadcastMessage(conversationId, content, sender, receiver);
   });
 
+
   ws.on('close', () => {
-    handleDisconnect(ws);
+    ws.close();
+    // handleDisconnect(ws);
   });
 
   ws.on('error', (error) => {
