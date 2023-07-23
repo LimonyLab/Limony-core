@@ -58,7 +58,13 @@ function ChatBox() {
             })
             .then(response => {
                 setMessages(response.data.conversation);
-                setReceiver(response.data.userId);
+                console.log("Lets look at response.data: ", response.data);
+                console.log("Lets look at currentUser.id: ", currentUser.id);
+                if (response.data.userId === currentUser.id) {
+                  setReceiver("supervisor@supervisor.com");
+                } else {
+                  setReceiver(response.data.userId);
+                }
             })
             .catch(error => {
                 console.error('Error fetching messages: ', error);
@@ -71,24 +77,25 @@ function ChatBox() {
           ws = new WebSocket(`ws://localhost:3000/chat-socket?conversationId=${conversationId}&sender=${currentUser.id}&receiver=${JSON.stringify(receiver)}`);
       
           ws.onopen = () => {
-          // Connection is opened
-          console.log('WebSocket connection open');
+            // Connection is opened
+            console.log('WebSocket connection open');
           };
       
           ws.onmessage = (message) => {
-          const newMessage = JSON.parse(message.data);
-          setMessages((prevMessages) => [...prevMessages, newMessage]);
+            console.log(message);
+            const newMessage = JSON.parse(message.data);
+            setMessages((prevMessages) => [...prevMessages, newMessage]);
           };
       
           ws.onerror = (error) => {
-          // Error occurred
-          console.error('WebSocket error: ', error);
+            // Error occurred
+            console.error('WebSocket error: ', error);
           };
       
           ws.onclose = () => {
-            // Connection is closed
-            ws.close();
-            console.log('WebSocket connection closed');
+              // Connection is closed
+              ws.close();
+              console.log('WebSocket connection closed');
           };
       
           return () => {
@@ -104,6 +111,7 @@ function ChatBox() {
   
     const handleSend = (messageContent) => {
         // Sending a new message using the WebSocket connection
+        console.log(`Sending message with conversationId: ${conversationId}, content: ${messageContent}, sender: ${currentUser.email}, receiver: ${receiver}`)
         const message = {
           conversationId: conversationId,
           content: messageContent,
