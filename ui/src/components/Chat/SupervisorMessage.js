@@ -24,7 +24,6 @@ const MessageDetails = styled.p`
 `;
 
 function SupervisorMessage({ content, sender, createdAt }) {
-    console.log('The supervisor message format is used...')
   return (
     <MessageContainer>
       <MessageContent>{content}</MessageContent>

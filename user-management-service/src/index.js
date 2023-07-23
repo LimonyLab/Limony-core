@@ -33,16 +33,14 @@ const server = http.createServer(app);
 
 
 server.on('upgrade', function upgrade(request, socket, head) {
+  logger.info('index.js, server.on(upgrade)');
   const url = require('url');
   const pathname = url.parse(request.url).pathname;
 
   if (pathname === '/chat-socket') {
-    console.log(pathname)
     wss.handleUpgrade(request, socket, head, function done(ws) {
-      console.log("We are at line 41 of index.js");
       wss.emit('connection', ws, request);
     });
-    console.log("We are at line 45 of index.js");
   } else {
     socket.destroy();
   }

@@ -1,4 +1,5 @@
 const Conversation = require('../models/Conversation');
+const logger = require('../utils/logger');
 
 
 // Ordinary server functionality
@@ -35,14 +36,32 @@ let newMessage = async (req, res) => {
 
 let getMessages = async (req, res) => {
   try {
-    const conversation = await Conversation.findOne({ userId: req.user._id });
+    if (req.user.role === 'employee') {
+      // Find the conversation associated with the logged in user based on the conversationId
+      const conversation = await Conversation.findOne({ _id: req.query.conversationId });
 
-    if (!conversation) {
-      return res.status(200).json({ conversation: [] });
+      if (!conversation) {
+        return res.status(200).json({ conversation: [], userId: conversation.userId });
+      }
+
+      res.status(200).json({ conversation: conversation.messages, userId: conversation.userId });
+    } else if (req.user.role === 'supervisor') {
+      // Find the conversation associated with the user based on the conversationId
+      const conversation = await Conversation.findOne({ _id: req.query.conversationId });
+
+      if (!conversation) {
+        return res.status(404).json({ error: 'Conversation not found to be viewed by the employee' });
+      }
+
+      res.status(200).json({ conversation: conversation.messages, userId: conversation.userId });    
+    } else {
+      // return an error if the user is not a supervisor or employee
+      logger.error('getMessages in chatController.js: Role not matching neither supervisor nor employee');
+      return res.status(403).json({ message: 'Unauthorized' });
     }
 
-    res.status(200).json({ conversation: conversation.messages });
   } catch (error) {
+    logger.error('getMessages in chatController.js: ', error);
     res.status(500).json({ error: 'There was a server error' });
   }
 };
