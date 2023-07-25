@@ -23,8 +23,7 @@ exports.register = async (req, res) => {
           user = new User(req.body);
 
           user.password = await bcrypt.hash(user.password, 10);
-          logger.info(`Newly hashed password: ${await user.password}`)
-          //user.save();
+          
           await user.save();
           logger.info(`User registered: ${user.email}`);
 
@@ -32,7 +31,8 @@ exports.register = async (req, res) => {
           // Create a new conversation when a user registers
           const conversation = new Conversation({
             messages: [],
-            userId: user._id
+            userId: user._id,
+            supervisorId: null
           });
           await conversation.save();
 
@@ -79,7 +79,6 @@ exports.register = async (req, res) => {
 
 
 
-
 exports.login = async (req, res) => {
   logger.info('Received a req to the login api.')
   try {
@@ -87,8 +86,6 @@ exports.login = async (req, res) => {
     if (!user) return res.status(400).json({ msg: 'User Not Exist' });
     const isMatch = await bcrypt.compare(req.body.password, user.password);
     if (!isMatch) return res.status(400).json({ msg: 'Incorrect Password!' });
-
-    
 
     const payload = {
       user: {
@@ -102,11 +99,16 @@ exports.login = async (req, res) => {
       {
         expiresIn: 3600,
       },
-      (err, token) => {
+      async (err, token) => {
         if (err) {
           logger.error("Error signing the token", err);
           return res.status(500).json({ message: 'Could not log in' });
         }
+
+        // Store the token in the user's document
+        user.tokens = user.tokens.concat({ token });
+        await user.save();
+
         res.status(200).json({
           token,
           user: {
@@ -114,19 +116,23 @@ exports.login = async (req, res) => {
             email: user.email,
             name: user.profile.name,
             age: user.profile.age,
-            registered: user.createdAt
+            registered: user.createdAt,
+            role: user.role
             // add any other user properties you need here
           }
         });
       }
     );
-    
 
   } catch (e) {
     logger.error(e.message);
     res.status(500).json({ message: 'Server Error' });
   }
 };
+
+exports.test = async (req, res) => {
+  return 0;
+}
 
 exports.getProfile = async (req, res) => {
   try {
@@ -160,3 +166,4 @@ exports.deleteProfile = async (req, res) => {
     res.status(500).send('Server Error');
   }
 };
+
