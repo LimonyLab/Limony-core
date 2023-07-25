@@ -5,6 +5,12 @@ const { Schema } = mongoose;
 const UserSchema = new Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true }, 
+  tokens: [{
+    token: {
+      type: String,
+      required: true
+    }
+  }],
   role: { type: String, default: 'employee' }, 
   conversationId: { type: String },
   profile: {
