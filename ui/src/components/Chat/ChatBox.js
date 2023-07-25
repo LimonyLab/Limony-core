@@ -1,7 +1,7 @@
 // src/components/Chat/ChatBox.js
 import React, { useEffect, useState, useContext, useRef } from 'react';
 import MyMessage from './MyMessage';
-import SupervisorMessage from './SupervisorMessage';
+import OtherMessage from './OtherMessage';
 import SendMessageForm from './SendMessageForm';
 import axios from 'axios';
 import { AuthProvider, AuthContext } from '../../context/auth'; // Added AuthContext
@@ -52,38 +52,42 @@ function ChatBox() {
     useEffect(() => {
         // Fetching the messages from the server
         axios.get(`http://localhost:3000/chat/get-messages?conversationId=${conversationId}`, {
-            headers: {
-                'Authorization': `Bearer ${authToken}`
-            }
-            })
-            .then(response => {
-                setMessages(response.data.conversation);
-                console.log("Lets look at response.data: ", response.data);
-                console.log("Lets look at currentUser.id: ", currentUser.id);
-                if (response.data.userId === currentUser.id) {
-                  setReceiver("supervisor@supervisor.com");
-                } else {
-                  setReceiver(response.data.userId);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching messages: ', error);
-            });
+          headers: {
+              'Authorization': `Bearer ${authToken}`
+          }
+          })
+          .then(response => {
+              setMessages(response.data.conversation);
+              console.log("Lets look at response.data: ", response.data);
+              console.log("Lets look at currentUser: ", currentUser);
+              if (response.data.userId === currentUser.id) {
+                setReceiver("supervisor@supervisor.com");
+              } else {
+                setReceiver(response.data.userId);
+              }
+          })
+          .catch(error => {
+              console.error('Error fetching messages: ', error);
+          });
     }, []);
 
     useEffect(() => {
       if (receiver && currentUser) {
-          console.log('////////// Creating a new websocket with receiver: ' + receiver);
-          ws = new WebSocket(`ws://localhost:3000/chat-socket?conversationId=${conversationId}&sender=${currentUser.id}&receiver=${JSON.stringify(receiver)}`);
+          ws = new WebSocket(`ws://localhost:3000/chat-socket?conversationId=${conversationId}&senderId=${currentUser.id}`);
       
           ws.onopen = () => {
             // Connection is opened
-            console.log('WebSocket connection open');
+            // Trying to authenticate the user in the first message here;
+            const message = {
+              token: authToken
+            };
+            ws.send(JSON.stringify(message));
           };
       
           ws.onmessage = (message) => {
             console.log(message);
             const newMessage = JSON.parse(message.data);
+            newMessage.createdAt = new Date();
             setMessages((prevMessages) => [...prevMessages, newMessage]);
           };
       
@@ -111,19 +115,16 @@ function ChatBox() {
   
     const handleSend = (messageContent) => {
         // Sending a new message using the WebSocket connection
-        console.log(`Sending message with conversationId: ${conversationId}, content: ${messageContent}, sender: ${currentUser.email}, receiver: ${receiver}`)
         const message = {
           conversationId: conversationId,
-          content: messageContent,
-          sender: currentUser.email,
-          receiver: receiver,
+          content: messageContent, 
         };
         ws.send(JSON.stringify(message));
         
         // Optimistically adding the new message to the UI here
         const newUIMessage = {
           content: messageContent,
-          sender: currentUser.email,
+          sender: currentUser.id,
           createdAt: new Date(),
         };
         setMessages((prevMessages) => [...prevMessages, newUIMessage]);
@@ -135,9 +136,9 @@ function ChatBox() {
         <ChatContainer>
             <MessagesContainer>
                 {messages.map((message, index) => 
-                    message.sender === 'supervisor@supervisor.com'
-                    ? <SupervisorMessage key={index} {...message} />
-                    : <MyMessage key={index} {...message} />
+                    message.sender === currentUser.id
+                    ? <OtherMessage key={index} {...message}/>
+                    : <MyMessage key={index} {...message}/>
                 )}
                 <div ref={messagesEndRef} />
             </MessagesContainer>

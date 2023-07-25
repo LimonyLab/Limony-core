@@ -1,4 +1,4 @@
-// src/components/Chat/SupervisorMessage.js
+// src/components/Chat/OtherMessage.js
 import React from 'react';
 import styled from 'styled-components';
 
@@ -23,7 +23,7 @@ const MessageDetails = styled.p`
   margin-top: -10px;
 `;
 
-function SupervisorMessage({ content, sender, createdAt }) {
+function OtherMessage({ content, sender, createdAt }) {
   return (
     <MessageContainer>
       <MessageContent>{content}</MessageContent>
@@ -32,4 +32,4 @@ function SupervisorMessage({ content, sender, createdAt }) {
   );
 }
 
-export default SupervisorMessage;
+export default OtherMessage;
