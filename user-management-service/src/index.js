@@ -11,6 +11,8 @@ const port = process.env.PORT || 3000;
 const http = require('http');
 const { wss } = require('./controllers/websocketController');
 
+const SECRET_KEY = '123456789';
+
 app.use(cors()); // use cors middleware
 
 // MongoDB connection
@@ -34,9 +36,9 @@ const server = http.createServer(app);
 
 server.on('upgrade', function upgrade(request, socket, head) {
   logger.info('index.js, server.on(upgrade)');
+
   const url = require('url');
   const pathname = url.parse(request.url).pathname;
-
   if (pathname === '/chat-socket') {
     wss.handleUpgrade(request, socket, head, function done(ws) {
       wss.emit('connection', ws, request);
@@ -44,6 +46,7 @@ server.on('upgrade', function upgrade(request, socket, head) {
   } else {
     socket.destroy();
   }
+
 });
 
 
