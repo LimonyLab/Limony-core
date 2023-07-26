@@ -26,9 +26,13 @@ const Login = () => {
     useEffect(() => {
         if (currentUser) {
             if (currentUser.role === "employee") {
-                navigate('/dashboard');
+                setTimeout(() => {
+                    navigate('/dashboard');
+                }, 3000);
             } else if (currentUser.role === "supervisor") {
-                navigate('/supervisor-dashboard');
+                setTimeout(() => {
+                    navigate('/supervisor-dashboard');
+                }, 3000);
             }
         }
     }, [currentUser, navigate]);
