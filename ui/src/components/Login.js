@@ -26,12 +26,16 @@ const Login = () => {
     useEffect(() => {
         if (currentUser) {
             if (currentUser.role === "employee") {
-                navigate('/dashboard');
+                setTimeout(() => {
+                    navigate('/dashboard');
+                }, 3000);
             } else if (currentUser.role === "supervisor") {
-                navigate('/supervisor-dashboard');
+                setTimeout(() => {
+                    navigate('/supervisor-dashboard');
+                }, 3000);
             }
         }
-    }, [currentUser, navigate]);
+    }, [currentUser]);
     
 
     const [errorMessage, setErrorMessage] = useState("");
@@ -75,15 +79,10 @@ const Login = () => {
         login(form.email, form.password)
           .then(() => {
             setSuccessMessage("Login successful! Redirecting you to your dashboard...");
-            if (currentUser.role === "employee") {
-                navigate('/dashboard'); 
-            } else if (currentUser.role === "supervisor") {
-                navigate('/supervisor-dashboard'); 
-            }
           })
           .catch((error) => {
             setErrorMessage("Login failed!");
-            console.error(error);
+            console.error("The error: ", error);
           });
     };
     

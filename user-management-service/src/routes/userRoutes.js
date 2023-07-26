@@ -5,8 +5,8 @@ const router = express.Router();
 
 router.post('/register', userController.register);
 router.post('/login', userController.login);
-router.get('/profile', auth, roleAuth, userController.getProfile); // protected route
-router.put('/profile', auth, roleAuth, userController.updateProfile); // protected route
-router.delete('/profile', auth, roleAuth, userController.deleteProfile); // protected route
-
+router.post('/logout', auth, userController.logout);
+router.get('/profile', auth, roleAuth, userController.getProfile); 
+router.put('/profile', auth, roleAuth, userController.updateProfile); 
+router.delete('/profile', auth, roleAuth, userController.deleteProfile); 
 module.exports = router;
