@@ -64,7 +64,7 @@ const auth = async (req, res, next) => {
 const roleAuth = async (req, res, next) => {
   // Printing the body of the function name of next:
 
-  if (req.user === undefined) {
+  if (req.user.role === undefined) {
     logger.error('Not authorized to access this resource ...');
     return res.status(403).send({ error: 'Not authorized to access this resource' });
   }
