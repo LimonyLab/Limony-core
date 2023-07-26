@@ -3,21 +3,35 @@ import { AppBar, Toolbar, IconButton, Typography, Button, Drawer, List, ListItem
 import { AccountCircle as AccountCircleIcon, SupervisorAccount as SupervisorAccountIcon, Chat as ChatIcon, Dashboard as DashboardIcon, Menu as MenuIcon } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import { AuthContext, useAuth } from '../../context/auth';
+import axios from "axios";
+
 
 const drawerWidth = 240;
 
 const HeaderAndDrawer = ({ children }) => {
-    const { authToken } = useContext(AuthContext);
     const { currentUser } = useAuth();
+    const { authToken, setAuthToken } = useContext(AuthContext); // add setAuthToken
 
     // Determine which navigation items to show based on currentUser role
     const navItems = currentUser.role === 'supervisor' ? 
         ['Supervisor Dashboard'] : ['Chat', 'Dashboard'];
 
     const handleLogout = () => {
-        // Implement server-side JWT invalidation here
-        localStorage.removeItem('jwtToken');
-        localStorage.removeItem('user');
+        axios.post('http://localhost:3000/users/logout', {}, {
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+        })
+        .then(() => {
+            setAuthToken(null);
+            localStorage.removeItem('jwtToken');
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+        })
+        .catch(error => {
+            console.log(error);
+            // Handle error as needed
+        })
     };
 
     const theme = useTheme();
