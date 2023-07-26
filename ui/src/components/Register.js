@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -7,12 +7,24 @@ import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import Alert from '@mui/material/Alert';
-
-
-//import '@fontsource/roboto/300.css';
+import { useAuth } from '../context/auth';
+import { useNavigate } from 'react-router-dom'; 
 
 
 const Register = () => {
+    const { currentUser } = useAuth();
+    const navigate = useNavigate(); 
+
+    useEffect(() => {
+        if (currentUser) {
+            if (currentUser.role === "employee") {
+                navigate('/dashboard');
+            } else if (currentUser.role === "supervisor") {
+                navigate('/supervisor-dashboard');
+            }
+        }
+    }, [currentUser, navigate]);
+    
     const [user, setUser] = useState({
         email: "",
         password: "",
