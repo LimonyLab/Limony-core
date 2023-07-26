@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -8,7 +8,9 @@ import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import Alert from '@mui/material/Alert';
 import { useNavigate } from 'react-router-dom'; 
-import { AuthContext } from '../context/auth';
+import { AuthContext, useAuth } from '../context/auth';
+
+
 
 
 const Login = () => {
@@ -17,11 +19,24 @@ const Login = () => {
         email: "",
         password: ""
     });
+    const { currentUser } = useAuth();
+
+    const navigate = useNavigate(); 
+
+    useEffect(() => {
+        if (currentUser) {
+            if (currentUser.role === "employee") {
+                navigate('/dashboard');
+            } else if (currentUser.role === "supervisor") {
+                navigate('/supervisor-dashboard');
+            }
+        }
+    }, [currentUser, navigate]);
+    
 
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
 
-    const navigate = useNavigate(); 
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -59,8 +74,12 @@ const Login = () => {
     
         login(form.email, form.password)
           .then(() => {
-            setSuccessMessage("Login successful!");
-            navigate('/dashboard'); 
+            setSuccessMessage("Login successful! Redirecting you to your dashboard...");
+            if (currentUser.role === "employee") {
+                navigate('/dashboard'); 
+            } else if (currentUser.role === "supervisor") {
+                navigate('/supervisor-dashboard'); 
+            }
           })
           .catch((error) => {
             setErrorMessage("Login failed!");

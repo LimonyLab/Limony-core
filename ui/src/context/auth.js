@@ -12,10 +12,6 @@ export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(storedUser ? JSON.parse(storedUser) : null);
   console.log("This is the current user in auth.js::: ", JSON.stringify(currentUser));
   const [authToken, setAuthToken] = useState(localStorage.getItem('jwtToken'));
-  
-  
-
-
 
 
   const value = {

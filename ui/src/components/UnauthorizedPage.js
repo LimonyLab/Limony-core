@@ -30,17 +30,16 @@ const UnauthorizedDescription = styled.p`
 
 const UnauthorizedPage = () => {
     const navigate = useNavigate();
-
-    console.log('We are in unauthorized Page...');
-
     const { currentUser } = useAuth();
 
+    /*
     useEffect(() => {
     if (!currentUser) {
         navigate('/login');
     }
     }, [currentUser, navigate]);
-
+    */
+   
     return (
         <UnauthorizedContainer>
           <UnauthorizedText>403 Unauthorized

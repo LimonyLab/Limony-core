@@ -97,7 +97,7 @@ exports.login = async (req, res) => {
       payload,
       SECRET_KEY,
       {
-        expiresIn: 3600,
+        expiresIn: '24h',
       },
       async (err, token) => {
         if (err) {
@@ -117,7 +117,8 @@ exports.login = async (req, res) => {
             name: user.profile.name,
             age: user.profile.age,
             registered: user.createdAt,
-            role: user.role
+            role: user.role,
+            conversationId: user.conversationId
             // add any other user properties you need here
           }
         });

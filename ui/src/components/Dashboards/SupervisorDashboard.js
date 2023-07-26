@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
-import { AuthContext } from '../context/auth';
+import { AuthContext } from '../../context/auth';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import UnauthorizedPage from './UnauthorizedPage';
+import UnauthorizedPage from '../UnauthorizedPage';
 
 
 const PanelContainer = styled.div`
@@ -40,7 +40,7 @@ const LastUpdated = styled.p`
 `;
 
 
-function SupervisorPanel() {
+function SupervisorDashboard() {
   const [conversations, setConversations] = useState([]);
   const { authToken, currentUser } = useContext(AuthContext); // get currentUser from context
   const navigate = useNavigate();
@@ -83,4 +83,4 @@ function SupervisorPanel() {
   );
 }
 
-export default SupervisorPanel;
+export default SupervisorDashboard;
