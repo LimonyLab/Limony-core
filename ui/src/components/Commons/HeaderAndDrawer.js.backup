@@ -1,0 +1,55 @@
+import React, { useContext } from 'react';
+import { AppBar, Toolbar, IconButton, Typography, Button, Drawer, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { AccountCircle as AccountCircleIcon, SupervisorAccount as SupervisorAccountIcon, Chat as ChatIcon, Dashboard as DashboardIcon } from '@mui/icons-material';
+import { Link } from 'react-router-dom';
+import { AuthContext, useAuth } from '../../context/auth';
+
+const HeaderAndDrawer = ({ children }) => {
+    const { authToken } = useContext(AuthContext);
+    const { currentUser } = useAuth();
+
+    // Determine which navigation items to show based on currentUser role
+    const navItems = currentUser.role === 'supervisor' ? 
+        ['Supervisor Dashboard'] : ['Chat', 'Dashboard'];
+
+    const handleLogout = () => {
+        // Implement server-side JWT invalidation here
+        localStorage.removeItem('jwtToken');
+    };
+
+    return (
+        <>
+        <AppBar position="static">
+            <Toolbar>
+            <Typography variant="h6" style={{flexGrow: 1}}>
+                Your App
+            </Typography>
+            <IconButton component={Link} to="/profile" color="inherit">
+                <AccountCircleIcon />
+            </IconButton>
+            <Button color="inherit" onClick={handleLogout}>Logout</Button>
+            </Toolbar>
+        </AppBar>
+        <Drawer variant="permanent" anchor="left">
+            <List>
+            {navItems.map((text, index) => {
+                const icon = text === 'Supervisor Dashboard' ? <DashboardIcon /> : 
+                             text === 'Chat' ? <ChatIcon /> : <DashboardIcon />;
+                return (
+                    <ListItem button key={text} component={Link} to={`/${text.toLowerCase().replace(' ', '-')}`}>
+                    <ListItemIcon>{icon}</ListItemIcon>
+                    <ListItemText primary={text} />
+                    </ListItem>
+                )
+            })}
+            </List>
+        </Drawer>
+        <main>
+            {children}
+        </main>
+        </>
+    );
+};
+
+
+export default HeaderAndDrawer;
