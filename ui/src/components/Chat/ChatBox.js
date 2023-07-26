@@ -4,9 +4,9 @@ import MyMessage from './MyMessage';
 import OtherMessage from './OtherMessage';
 import SendMessageForm from './SendMessageForm';
 import axios from 'axios';
-import { AuthProvider, AuthContext } from '../../context/auth'; // Added AuthContext
-import { useAuth } from '../../context/auth'; // Corrected path to useAuth
-import { useNavigate, useParams } from 'react-router-dom'; // Import useNavigate
+import { AuthProvider, AuthContext } from '../../context/auth'; 
+import { useAuth } from '../../context/auth'; 
+import { useNavigate, useParams } from 'react-router-dom'; 
 import styled from 'styled-components';
 
 const ChatContainer = styled.div`
@@ -16,7 +16,7 @@ const ChatContainer = styled.div`
   overflow: auto;
   margin: 1em;
   padding: 1em;
-  width:50%;
+  width:70%;
 `;
 
 const MessagesContainer = styled.div`
@@ -37,6 +37,10 @@ function ChatBox() {
 
     const navigate = useNavigate(); // Initialize useNavigate
 
+    if (conversationId === undefined) {
+      conversationId = currentUser.conversationId;
+    }
+
     useEffect(() => {
       if (!currentUser) {
           navigate('/login');
@@ -51,6 +55,7 @@ function ChatBox() {
 
     useEffect(() => {
         // Fetching the messages from the server
+        
         axios.get(`http://localhost:3000/chat/get-messages?conversationId=${conversationId}`, {
           headers: {
               'Authorization': `Bearer ${authToken}`

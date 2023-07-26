@@ -96,14 +96,12 @@ let sendMessage = async (req, res) => {
 };
 
 let getAllConversations = async (req, res) => {
-  console.log("We are at line 80")
   // check if the role of the user is supervisor
   if (req.user.role !== 'supervisor') {
     return res.status(403).json({ message: 'Unauthorized' });
   }
 
   try {
-    console.log("We are at line 87")
 
     const conversations = await Conversation.find()
       .populate('userId', 'email -_id') // populate the email of the user
@@ -118,11 +116,8 @@ let getAllConversations = async (req, res) => {
       }
     });
 
-    console.log('We are at line 102');
-
     return res.status(200).json({ conversations });
   } catch (error) {
-    console.log("We are at line 105")
     console.log(error);
     return res.status(500).json({ error: 'There was a server error' });
   }

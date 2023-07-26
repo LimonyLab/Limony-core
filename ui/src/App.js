@@ -1,17 +1,18 @@
-import { BrowserRouter as Router, Routes, Route, useParams } from "react-router-dom";
+import { AuthContext } from './context/auth';
+import { useParams } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import * as React from 'react';
 import Register from './components/Register';
 import Login from './components/Login';
-import Dashboard from './components/Dashboard';
+import Dashboard from './components/Dashboards/Dashboard';
 import Chat from './components/Chat';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { AuthProvider, AuthContext } from './context/auth';
-import SupervisorPanel from './components/SupervisorPanel';
+import { AuthProvider, useAuth } from './context/auth';
+import SupervisorDashboard from './components/Dashboards/SupervisorDashboard';
 import UnauthorizedPage from './components/UnauthorizedPage';
-
-
+import HeaderAndDrawer from './components/Commons/HeaderAndDrawer';
 
 function App() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -27,7 +28,6 @@ function App() {
   );
 
   return (
-    
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AuthProvider>
@@ -35,19 +35,18 @@ function App() {
           <Routes>
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/chat/:conversationId" element={<ChatWrapper />} />
-           
-            <Route
-              path="/supervisor-panel"
-              element={
-                <AuthContext.Consumer>
-                  {(context) => <SupervisorPanel user={context.user} />}
-                </AuthContext.Consumer>
-              }
-            />
-            <Route path="/" element={<Login />} />
-            <Route path="/UnauthorizedPage" element={<UnauthorizedPage />} />
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/unauthorized" element={<UnauthorizedPage />} />
+            <Route path="*" element={
+              <HeaderAndDrawer>
+                <Routes>
+                  <Route path="/dashboard" element={<ProtectedComponent Component={Dashboard} />} />
+                  <Route path="/chat/:conversationId" element={<ProtectedComponent Component={ChatWrapper} />} />
+                  <Route path="/chat" element={<ProtectedComponent Component={Chat} />} />
+                  <Route path="/supervisor-dashboard" element={<ProtectedComponent Component={SupervisorDashboard} />} />
+                </Routes>
+              </HeaderAndDrawer>
+            }/>
           </Routes>
         </Router>
       </AuthProvider>
@@ -55,7 +54,14 @@ function App() {
   );
 }
 
-
+function ProtectedComponent({ Component }) {
+  const auth = useAuth();
+  if (auth.currentUser) {
+    return <Component />;
+  } else {
+    return <Navigate to="/unauthorized" />;
+  }
+}
 
 function ChatWrapper() {
   const { conversationId } = useParams(); // Access the conversationId from the path
