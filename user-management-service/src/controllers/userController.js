@@ -131,9 +131,17 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.test = async (req, res) => {
-  return 0;
-}
+exports.logout = async (req, res) => {
+  try {
+    req.user.tokens = req.user.tokens.filter((token) => {
+      return token.token != req.token;
+    });
+    await req.user.save();
+    res.send({ message: 'Logged out successfully' });
+  } catch (error) {
+    res.status(500).send(error);
+  }
+};
 
 exports.getProfile = async (req, res) => {
   try {
