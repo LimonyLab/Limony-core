@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { AppBar, Toolbar, IconButton, Typography, Button, Drawer, List, ListItem, ListItemIcon, ListItemText, useTheme, useMediaQuery } from '@mui/material';
 import { AccountCircle as AccountCircleIcon, SupervisorAccount as SupervisorAccountIcon, Chat as ChatIcon, Dashboard as DashboardIcon, Menu as MenuIcon } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
@@ -9,12 +9,46 @@ import axios from "axios";
 const drawerWidth = 240;
 
 const HeaderAndDrawer = ({ children }) => {
-    const { currentUser } = useAuth();
-    const { authToken, setAuthToken } = useContext(AuthContext); // add setAuthToken
+    const { currentUser, authToken, setAuthToken, tokenExpiresIn, isTokenValid } = useAuth(); 
+    // define navItems as a state variable
+    const [navItems, setNavItems] = useState([]);
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const [mobileOpen, setMobileOpen] = useState(false);
+    const handleDrawerToggle = () => {
+        setMobileOpen(!mobileOpen);
+    };
 
-    // Determine which navigation items to show based on currentUser role
-    const navItems = currentUser.role === 'supervisor' ? 
-        ['Supervisor Dashboard'] : ['Chat', 'Dashboard'];
+
+    const checkAndReactToTokenValidity = () => {
+        console.log('Checking for token validity and reacting to ....')
+        if (!isTokenValid()) {
+            console.log(`Token is ${authToken} and it expires in ${tokenExpiresIn}`)
+            console.log('Token is not valid, so redirecting to unauthorized page')
+            console.log(`According to localStorage, the expiry is ${localStorage.getItem('tokenExpiresIn')}`)
+            
+            setAuthToken(null);
+            localStorage.removeItem('jwtToken');
+            localStorage.removeItem('user');
+            localStorage.removeItem('tokenExpiresIn');
+            window.location.href = '/login';
+            
+        }
+    };
+
+
+    useEffect(() => {
+        checkAndReactToTokenValidity();
+        if (currentUser && isTokenValid()) {
+            if (currentUser.role === 'supervisor') {
+                setNavItems(['Chat', 'Supervisor Dashboard']);
+            } else {
+                setNavItems(['Chat', 'Dashboard']);
+            }
+        
+        }
+    }, [currentUser]);
+      
 
     const handleLogout = () => {
         axios.post('http://localhost:3000/users/logout', {}, {
@@ -26,6 +60,7 @@ const HeaderAndDrawer = ({ children }) => {
             setAuthToken(null);
             localStorage.removeItem('jwtToken');
             localStorage.removeItem('user');
+            localStorage.removeItem('tokenExpiresIn');
             window.location.href = '/login';
         })
         .catch(error => {
@@ -34,15 +69,7 @@ const HeaderAndDrawer = ({ children }) => {
         })
     };
 
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
-    const [mobileOpen, setMobileOpen] = useState(false);
-
-    const handleDrawerToggle = () => {
-        setMobileOpen(!mobileOpen);
-    };
-
+    
     const drawer = (
         <div>
             <div style={{display: 'flex', alignItems: 'center', justifyContent: 'start', padding: '10px', fontSize: '24px'}}>
