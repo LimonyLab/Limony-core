@@ -34,7 +34,7 @@ const auth = async (req, res, next) => {
   const authHeader = req.header('Authorization');
   //console.log('Auth header is ', authHeader)
   if (!authHeader) {
-    logger.error('Not authorized to access this resource');
+    logger.error('% Not authorized to access this resource');
     return res.status(401).send({ error: 'Not authorized to access this resource' });
   }
   const token = authHeader.replace('Bearer ', '');
@@ -43,8 +43,8 @@ const auth = async (req, res, next) => {
     //console.log(">>>>>>>> This is SECRET_KEY now: ", SECRET_KEY)
     //console.log("- - - - - - - - - - - - - - -  - - - - -")
     const data = jwt.verify(token, SECRET_KEY);
-    //console.log("&&&&& Data is: ", data);
-    //console.log('&&&&& Data.user.id: ', data.user.id)
+    console.log("&&&&& Data is: ", data);
+    console.log('&&&&& Data.user.id: ', data.user.id)
     const user = await User.findOne({ _id: data.user.id, 'tokens.token': token });
     if (!user) {
       throw new Error();
@@ -54,7 +54,7 @@ const auth = async (req, res, next) => {
   } catch (error) {
     console.log("The actual error is: ", error);
     logger.error('Not authorized to access this resource');
-    res.status(401).send({ error: 'Not authorized to access this resource' });
+    return res.status(401).send({ error: 'Not authorized to access this resource' });
   }
   next();
 };

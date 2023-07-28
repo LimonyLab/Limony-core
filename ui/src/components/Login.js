@@ -14,7 +14,7 @@ import { AuthContext, useAuth } from '../context/auth';
 
 
 const Login = () => {
-    const { setAuthToken, setCurrentUser } = useContext(AuthContext);
+    const { setAuthToken, setCurrentUser, setTokenExpiresIn } = useContext(AuthContext);
     const [form, setForm] = useState({
         email: "",
         password: ""
@@ -55,16 +55,18 @@ const Login = () => {
         return new Promise(async (resolve, reject) => {
             try {
                 const response = await axios.post("http://localhost:3000/users/login", { email, password });
-                // Set auth token in local storage and context
 
                 console.log("this is the user data returned...:");
                 console.log(response);
-
-                const { token, user } = response.data; // Assuming user data is also returned
+                
+                const { token, user, tokenExpiresIn } = response.data;     
+                console.log("in Login.js, setting the tokenExpiresIn to " + tokenExpiresIn)            
                 localStorage.setItem("jwtToken", token);
-                localStorage.setItem("user", JSON.stringify(user)); // store user data
+                localStorage.setItem("user", JSON.stringify(user)); 
+                localStorage.setItem("tokenExpiresIn", tokenExpiresIn);
                 setAuthToken(token);
                 setCurrentUser(user); // set user data in context
+                setTokenExpiresIn(tokenExpiresIn);
                 resolve();
     
             } catch (error) {
