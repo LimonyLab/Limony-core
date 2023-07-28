@@ -109,8 +109,14 @@ exports.login = async (req, res) => {
         user.tokens = user.tokens.concat({ token });
         await user.save();
 
+
+        // Calculate the token expiry time
+        const tokenExpiresIn = Math.floor(Date.now() / 1000) + (24 * 60 * 60);
+
+
         res.status(200).json({
           token,
+          tokenExpiresIn,
           user: {
             id: user.id,
             email: user.email,
