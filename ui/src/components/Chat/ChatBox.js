@@ -66,6 +66,8 @@ function ChatBox() {
           })
           .then(response => {
               setMessages(response.data.conversation);
+              console.log("The following is our conversation...: ")
+              console.log(response.data.conversation);
               console.log("Lets look at response.data: ", response.data);
               console.log("Lets look at currentUser: ", currentUser);
               if (response.data.userId === currentUser.id) {
@@ -132,7 +134,8 @@ function ChatBox() {
         // Optimistically adding the new message to the UI here
         const newUIMessage = {
           content: messageContent,
-          sender: currentUser.id,
+          senderId: currentUser.id,
+          senderName: currentUser.name,
           createdAt: new Date(),
         };
         setMessages((prevMessages) => [...prevMessages, newUIMessage]);
@@ -144,7 +147,7 @@ function ChatBox() {
         <ChatContainer>
             <MessagesContainer>
                 {messages.map((message, index) => 
-                    message.sender === currentUser.id
+                    message.senderId === currentUser.id
                     ? <OtherMessage key={index} {...message}/>
                     : <MyMessage key={index} {...message}/>
                 )}
