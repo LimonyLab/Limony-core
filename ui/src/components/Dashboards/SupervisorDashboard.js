@@ -7,7 +7,7 @@ import UnauthorizedPage from '../UnauthorizedPage';
 
 
 const PanelContainer = styled.div`
-  background-color: #1a1a1d;
+  background-color: #c3eaf7;
   color: #fff;
   min-height: 100vh;
   padding: 20px;
