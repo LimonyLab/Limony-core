@@ -13,15 +13,26 @@ import { AuthProvider, useAuth } from './context/auth';
 import SupervisorDashboard from './components/Dashboards/SupervisorDashboard';
 import UnauthorizedPage from './components/UnauthorizedPage';
 import HeaderAndDrawer from './components/Commons/HeaderAndDrawer';
+import { styled } from '@mui/system';
+import textureTasticGrayPattern from './images/texturetastic_gray.png'; 
 
 function App() {
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: light)');
 
   const theme = React.useMemo(
     () =>
       createTheme({
         palette: {
           mode: prefersDarkMode ? 'dark' : 'light',
+        },
+        components: {
+          CssBaseline: {
+            styleOverrides: `
+              body {
+                background: url(${textureTasticGrayPattern});
+              }
+            `,
+          },
         },
       }),
     [prefersDarkMode],

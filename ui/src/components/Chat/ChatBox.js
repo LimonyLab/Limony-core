@@ -43,7 +43,10 @@ function ChatBox() {
 
     useEffect(() => {
       if (!currentUser) {
-          navigate('/login');
+        navigate('/login');
+      }
+      if ((conversationId != currentUser.conversationId) && (currentUser.role === 'employee')) {
+          navigate('/unauthorized');
       }
     }, [currentUser, navigate]);
 
