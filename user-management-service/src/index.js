@@ -35,6 +35,7 @@ const server = http.createServer(app);
 
 
 server.on('upgrade', function upgrade(request, socket, head) {
+  
   logger.info('index.js, server.on(upgrade)');
 
   const url = require('url');

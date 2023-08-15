@@ -7,7 +7,7 @@ import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import Alert from '@mui/material/Alert';
-import { useNavigate } from 'react-router-dom'; 
+import { Link, useNavigate } from 'react-router-dom'; 
 import { AuthContext, useAuth } from '../context/auth';
 
 
@@ -145,8 +145,15 @@ const Login = () => {
                                 Sign In
                             </Button>
                         </Grid>
+                        <Grid item xs={12}>
+                            <Typography align="center">
+                                Don't have an account? <Link to="/register">Register</Link>
+                            </Typography>
+                        </Grid>
                     </Grid>
                 </form>
+
+            
             </Paper>
         </Container>
     );

@@ -8,7 +8,7 @@ import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import Alert from '@mui/material/Alert';
 import { useAuth } from '../context/auth';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate, Link } from 'react-router-dom'; 
 
 
 const Register = () => {
@@ -118,8 +118,8 @@ const Register = () => {
 
     return (
         <Container component="main" maxWidth="xs">
-            <Typography variant="h6" color="textSecondary" align="center" style={{ marginTop: '4em', marginBottom: '2em' }} gutterBottom>
-                Please register using the email you would like to receive recommendations on.
+            <Typography variant="h6" color="textSecondary" align="center" style={{ marginTop: '1em', marginBottom: '1em' }} gutterBottom>
+                Please register using the email you would like to receive support on.
             </Typography>
             
         <Paper elevation={3} style={{ padding: 16, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -226,9 +226,13 @@ const Register = () => {
                 >
                     Register
                 </Button>
-
+                
             </form>
-
+            <Grid item xs={12} style={{ marginTop: '10px' }}>
+                    <Typography align="center">
+                        Already have an account? <Link to="/login">Login</Link>
+                    </Typography>
+            </Grid>
         </Paper>
     </Container>
     );

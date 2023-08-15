@@ -20,13 +20,5 @@ router.get('/all-conversations', auth, roleAuth, chatController.getAllConversati
 router.get('/metadata/:conversationId', auth, chatController.getChatMetdata);
 
 
-// New;
-// Route to handle a new message from a user
-router.post('/new-message/:conversationId', auth, chatController.newMessageSupervisorChat);
-
-// Route to fetch messages for a given user
-router.get('/get-messages/:conversationId', auth, chatController.getMessagesSupervisorChat);
-
-
 
 module.exports = router;

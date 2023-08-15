@@ -36,10 +36,15 @@ let newMessage = async (req, res) => {
 
 let getMessages = async (req, res) => {
   try {
+
     if (req.user.role === 'employee') {
       // Find the conversation associated with the logged in user based on the conversationId
-      const conversation = await Conversation.findOne({ _id: req.query.conversationId });
-
+      if (!req.query.conversationId) {
+        return res.status(400).json({ error: 'conversationId is required' });
+      } else if (req.user.conversationId !== req.query.conversationId) {
+        return res.status(403).json({ error: 'Unauthorized' });
+      }
+      const conversation = await Conversation.findOne({ _id: req.user.conversationId });
       if (!conversation) {
         return res.status(200).json({ conversation: [], userId: conversation.userId });
       }
@@ -203,7 +208,6 @@ let getMessagesSupervisorChat = async (req, res) => {
     res.status(500).json({ error: 'There was a server error' });
   }
 };
-
 
 // Combining newMessage and newMessageSupervisorChat controllers
 let newMessage_ = async (req, res) => {

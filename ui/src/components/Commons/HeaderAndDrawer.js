@@ -41,7 +41,7 @@ const HeaderAndDrawer = ({ children }) => {
         checkAndReactToTokenValidity();
         if (currentUser && isTokenValid()) {
             if (currentUser.role === 'supervisor') {
-                setNavItems(['Chat', 'Supervisor Dashboard']);
+                setNavItems(['Supervisor Dashboard']);
             } else {
                 setNavItems(['Chat', 'Dashboard']);
             }
