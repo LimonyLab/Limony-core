@@ -83,7 +83,7 @@ function ChatBox() {
 
     useEffect(() => {
       if (receiver && currentUser) {
-          ws = new WebSocket(`ws://localhost:3000/chat-socket?conversationId=${conversationId}&senderId=${currentUser.id}`);
+          ws = new WebSocket(`ws://localhost:3000/chat-socket?conversationId=${conversationId}&senderId=${currentUser.id}&senderName=${currentUser.name}`);
       
           ws.onopen = () => {
             // Connection is opened
@@ -95,6 +95,7 @@ function ChatBox() {
           };
       
           ws.onmessage = (message) => {
+            console.log("New message is:::: ")
             console.log(message);
             const newMessage = JSON.parse(message.data);
             newMessage.createdAt = new Date();
