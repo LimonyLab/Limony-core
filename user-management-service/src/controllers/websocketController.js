@@ -24,7 +24,7 @@ let newMessage = async (conversationId, content, sender) => {
       conversation.messages.push({
         sender,
         content: content,
-        recipient: 'supervisor'
+        recipient: 'Assistant'
       });
   
       await conversation.save();
@@ -51,7 +51,7 @@ let handleDisconnect = (ws) => {
   */
 };
 
-let broadcastMessage = (conversationId, content, sender, receiver) => {
+let broadcastMessage = (conversationId, content, sender, senderName, receiver) => {
   console.log(`# broadcasting > conversationId: ${conversationId}, content: ${content}, sender: ${sender}, receiver: ${receiver}`);
 
   let thisConversationWebsocketMap = conversationWebsockets.get(conversationId);
@@ -62,6 +62,7 @@ let broadcastMessage = (conversationId, content, sender, receiver) => {
       conversationId,
       content,
       sender,
+      senderName,
       receiver,
     }));
   } 
@@ -80,9 +81,10 @@ wss.on('connection', (ws, req) => {
   const request_url = new URL(req.url, `http://${req.headers.host}`);
   let conversationId = request_url.searchParams.get('conversationId');
   let senderId = request_url.searchParams.get('senderId');
+  let senderName = request_url.searchParams.get('senderName');
 
   
-  // Store the conversation websocket in for the in conversationWebSockets if it does not already exist (for the specific userId)
+  // Store the conversation we bsocket in for the in conversationWebSockets if it does not already exist (for the specific userId)
   if (!conversationWebsockets.has(conversationId)) {
     let thisConversationWebsocketMap = new Map();
     let thisSenderIdMap = new Map();
@@ -171,7 +173,7 @@ wss.on('connection', (ws, req) => {
       console.log(`The receiver is ${receiver}`);
       if (receiver !== null) {
         // Now, broadcast the message
-        broadcastMessage(conversationId, content, sender, receiver);
+        broadcastMessage(conversationId, content, sender, senderName, receiver);
       }
       
     }

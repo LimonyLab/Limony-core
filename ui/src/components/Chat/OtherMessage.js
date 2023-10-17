@@ -7,7 +7,7 @@ const MessageContainer = styled.div`
   flex-direction: column;
   align-items: flex-start;
   margin: 10px 0;
-  background-color: #00396e;
+  background-color: #1976d2;
   border-radius: 5px;
   padding: 10px;
 `;
@@ -23,11 +23,11 @@ const MessageDetails = styled.p`
   margin-top: -10px;
 `;
 
-function OtherMessage({ content, sender, createdAt }) {
+function OtherMessage({ content, senderId, senderName, createdAt }) {
   return (
     <MessageContainer>
       <MessageContent>{content}</MessageContent>
-      <MessageDetails>{sender} at {new Date(createdAt).toLocaleTimeString()}</MessageDetails>
+      <MessageDetails>{senderName} at {new Date(createdAt).toLocaleTimeString()}</MessageDetails>
     </MessageContainer>
   );
 }
