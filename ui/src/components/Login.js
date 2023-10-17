@@ -7,7 +7,7 @@ import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import Alert from '@mui/material/Alert';
-import { Link, useNavigate } from 'react-router-dom'; 
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext, useAuth } from '../context/auth';
 
 
@@ -21,7 +21,7 @@ const Login = () => {
     });
     const { currentUser } = useAuth();
 
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (currentUser) {
@@ -36,7 +36,7 @@ const Login = () => {
             }
         }
     }, [currentUser]);
-    
+
 
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
@@ -54,21 +54,21 @@ const Login = () => {
     const login = (email, password) => {
         return new Promise(async (resolve, reject) => {
             try {
-                const response = await axios.post("http://localhost:3000/users/login", { email, password });
+                const response = await axios.post("https://chat.limonylab.com/users/login", { email, password });
 
                 console.log("this is the user data returned...:");
                 console.log(response);
-                
-                const { token, user, tokenExpiresIn } = response.data;     
-                console.log("in Login.js, setting the tokenExpiresIn to " + tokenExpiresIn)            
+
+                const { token, user, tokenExpiresIn } = response.data;
+                console.log("in Login.js, setting the tokenExpiresIn to " + tokenExpiresIn)
                 localStorage.setItem("jwtToken", token);
-                localStorage.setItem("user", JSON.stringify(user)); 
+                localStorage.setItem("user", JSON.stringify(user));
                 localStorage.setItem("tokenExpiresIn", tokenExpiresIn);
                 setAuthToken(token);
                 setCurrentUser(user); // set user data in context
                 setTokenExpiresIn(tokenExpiresIn);
                 resolve();
-    
+
             } catch (error) {
                 reject(error);
             }
@@ -77,17 +77,17 @@ const Login = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-    
+
         login(form.email, form.password)
-          .then(() => {
-            setSuccessMessage("Login successful! Redirecting you to your dashboard...");
-          })
-          .catch((error) => {
-            setErrorMessage("Login failed!");
-            console.error("The error: ", error);
-          });
+            .then(() => {
+                setSuccessMessage("Login successful! Redirecting you to your dashboard...");
+            })
+            .catch((error) => {
+                setErrorMessage("Login failed!");
+                console.error("The error: ", error);
+            });
     };
-    
+
 
     const successAlert = successMessage ? <Alert severity="success">{successMessage}</Alert> : null;
     const errorAlert = errorMessage ? <Alert severity="error">{errorMessage}</Alert> : null;
@@ -153,7 +153,7 @@ const Login = () => {
                     </Grid>
                 </form>
 
-            
+
             </Paper>
         </Container>
     );
