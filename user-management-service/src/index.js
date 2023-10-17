@@ -7,10 +7,11 @@ const userRoutes = require('./routes/userRoutes'); // import user routes
 const chatRoutes = require('./routes/chatRoutes'); // import chat routes
 var cors = require('cors');
 const app = express();
-const port = process.env.PORT || 3000;
-const http = require('http');
+const port = process.env.PORT || 443;
+//const http = require('http');
 const https = require('https');
 const fs = require('fs');
+const path = require('path');
 const { wss } = require('./controllers/websocketController');
 
 const privateKey = fs.readFileSync('/etc/letsencrypt/live/chat.limonylab.com/privkey.pem', 'utf8');
@@ -30,7 +31,8 @@ const SECRET_KEY = '123456789';
 app.use(cors()); // use cors middleware
 
 // MongoDB connection
-mongoose.connect('mongodb://admin:123456789@localhost:27017/user-management?authSource=admin', {
+// local (test) mongodb connection string: mongodb://admin:123456789@localhost:27017/user-management?authSource=admin
+mongoose.connect('mongodb://mainMongodbAdmin:EshghamXodastTa1000Sal@13.48.61.75:27017/admin', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -41,6 +43,8 @@ db.once('open', function () {
 });
 
 app.use(express.json()); // for parsing application/json
+console.log(__dirname)
+app.use(express.static(path.join(__dirname, '../../ui/build/')));
 app.use('/users', userRoutes); // use user routes
 app.use('/chat', chatRoutes); // use chat routes
 
@@ -48,10 +52,12 @@ app.use('/chat', chatRoutes); // use chat routes
 // Create an HTTPS server instead
 const httpsServer = https.createServer(credentials, app);
 
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname + '../../../ui/build/index.html'));
+});
 
 
-
-server.on('upgrade', function upgrade(request, socket, head) {
+httpsServer.on('upgrade', function upgrade(request, socket, head) {
 
   logger.info('index.js, server.on(upgrade)');
 
@@ -71,4 +77,3 @@ server.on('upgrade', function upgrade(request, socket, head) {
 httpsServer.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
-
