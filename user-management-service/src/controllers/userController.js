@@ -10,7 +10,7 @@ const axios = require('axios');
 const SECRET_KEY = '123456789';
 
 
-exports.register = async (req, res) => { 
+exports.register = async (req, res) => {
   try {
     // Check if this user already exists
     User.findOne({ email: req.body.email })
@@ -18,14 +18,19 @@ exports.register = async (req, res) => {
         if (user) {
           return res.status(400).json({ message: 'Email already exists' });
         } else {
-          console.log(19);
+
           // Create and save the user
           user = new User(req.body);
 
           user.password = await bcrypt.hash(user.password, 10);
-          
-          await user.save();
-          logger.info(`User registered: ${user.email}`);
+
+          try {
+            await user.save();
+            logger.info(`User registered: ${user.email}`);
+          } catch (err) {
+            logger.error('Error saving user:', err);
+            return res.status(500).json({ message: 'Error saving user to the database.' });
+          }
 
           console.log(29);
           // Create a new conversation when a user registers
@@ -38,8 +43,9 @@ exports.register = async (req, res) => {
 
           // Store the conversation ID in the user's document
           user.conversationId = conversation._id;
-          await user.save();
-          
+
+
+
 
 
           const email = {
@@ -52,28 +58,29 @@ exports.register = async (req, res) => {
               <p>...</p>
             `,
           };
-          
+
 
           // Send a welcome email to the newly created user. 
           axios.post('http://localhost:3002/enqueue-email', email)
-          .then((response) => {
-            console.log('Enqueued email: ', response.data);
-          })
-          .catch((error) => {
-            console.error('Error enqueueing email: ', error);
-          });
+            .then((response) => {
+              console.log('Enqueued email: ', response.data);
+            })
+            .catch((error) => {
+              console.error('Error enqueueing email: ', error);
+            });
 
-          
+
           return res.status(201).json({ email: user.email, message: 'User registered successfully.' });
         }
       })
       .catch(err => {
+
         logger.error('Error while checking existing user:', err);
         return res.status(500).json({ message: 'Server error' });
       });
   } catch (err) {
     logger.error(err.message);
-    return res.status(500).json({ message: 'Error registering user.' });  
+    return res.status(500).json({ message: 'Error registering user.' });
   }
 };
 

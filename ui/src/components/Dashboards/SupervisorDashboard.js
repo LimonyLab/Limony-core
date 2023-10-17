@@ -7,7 +7,7 @@ import UnauthorizedPage from '../UnauthorizedPage';
 
 
 const PanelContainer = styled.div`
-  background-color: #1a1a1d;
+  background-color: #c3eaf7;
   color: #fff;
   min-height: 100vh;
   padding: 20px;
@@ -53,17 +53,17 @@ function SupervisorDashboard() {
   }, [currentUser, navigate]);
 
   useEffect(() => {
-    axios.get('http://localhost:3000/chat/all-conversations', {
+    axios.get('https://chat.limonylab.com/chat/all-conversations', {
       headers: {
         'Authorization': `Bearer ${authToken}`
       }
     })
-    .then(response => {
-      setConversations(response.data.conversations);
-    })
-    .catch(error => {
-      console.error('Error fetching conversations: ', error);
-    });
+      .then(response => {
+        setConversations(response.data.conversations);
+      })
+      .catch(error => {
+        console.error('Error fetching conversations: ', error);
+      });
   }, []);
 
   const handleChatSelect = (conversationId) => {
