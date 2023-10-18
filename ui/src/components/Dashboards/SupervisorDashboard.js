@@ -3,7 +3,6 @@ import axios from 'axios';
 import { AuthContext } from '../../context/auth';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import UnauthorizedPage from '../UnauthorizedPage';
 
 
 const PanelContainer = styled.div`
@@ -53,20 +52,26 @@ function SupervisorDashboard() {
   }, [currentUser, navigate]);
 
   useEffect(() => {
+    console.log('55');
     axios.get('https://chat.limonylab.com/chat/all-conversations', {
       headers: {
         'Authorization': `Bearer ${authToken}`
       }
     })
       .then(response => {
+        console.log('62');
         setConversations(response.data.conversations);
+        console.log("These are the conversations... ")
+        console.log(conversations);
       })
       .catch(error => {
+        console.log('66');
         console.error('Error fetching conversations: ', error);
       });
   }, []);
 
   const handleChatSelect = (conversationId) => {
+    console.log('72');
     // Navigate to the chat page with the selected conversationId
     navigate(`/chat/${conversationId}`);
   };
