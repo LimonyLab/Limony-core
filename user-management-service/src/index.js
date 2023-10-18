@@ -32,7 +32,7 @@ app.use(cors()); // use cors middleware
 
 // MongoDB connection
 // local (test) mongodb connection string: mongodb://admin:123456789@localhost:27017/user-management?authSource=admin
-mongoose.connect('mongodb://mainMongodbAdmin:EshghamXodastTa1000Sal@13.48.61.75:27017/admin', {
+mongoose.connect('mongodb://mainMongodbAdmin:EshghamXodastTa1000Sal@127.0.0.1:27017/user-management?authSource=admin', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });

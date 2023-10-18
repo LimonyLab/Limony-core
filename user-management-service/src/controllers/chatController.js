@@ -36,7 +36,6 @@ let newMessage = async (req, res) => {
 
 let getMessages = async (req, res) => {
   try {
-
     if (req.user.role === 'employee') {
       // Find the conversation associated with the logged in user based on the conversationId
       if (!req.query.conversationId) {
@@ -45,10 +44,10 @@ let getMessages = async (req, res) => {
         return res.status(403).json({ error: 'Unauthorized' });
       }
       const conversation = await Conversation.findOne({ _id: req.user.conversationId });
+
       if (!conversation) {
         return res.status(200).json({ conversation: [], userId: conversation.userId });
       }
-
       res.status(200).json({ conversation: conversation.messages, userId: conversation.userId });
     } else if (req.user.role === 'supervisor') {
       // Find the conversation associated with the user based on the conversationId
@@ -58,7 +57,7 @@ let getMessages = async (req, res) => {
         return res.status(404).json({ error: 'Conversation not found to be viewed by the employee' });
       }
 
-      res.status(200).json({ conversation: conversation.messages, userId: conversation.userId });    
+      res.status(200).json({ conversation: conversation.messages, userId: conversation.userId });
     } else {
       // return an error if the user is not a supervisor or employee
       logger.error('getMessages in chatController.js: Role not matching neither supervisor nor employee');
@@ -126,12 +125,12 @@ let getAllConversations = async (req, res) => {
     console.log(error);
     return res.status(500).json({ error: 'There was a server error' });
   }
-};  
+};
 
 
 
 let getChatMetdata = async (req, res) => {
-  
+
   try {
     const { conversationId } = req.params;
 
@@ -148,10 +147,10 @@ let getChatMetdata = async (req, res) => {
     console.log('conversation id is: ', conversationId);
     console.log('Returning this lastMessage: ', lastMessage.updatedAt);
     console.log('- - - - - - - - - - - - - - - - - - - - - - - - -');
-    
+
 
     // return the conversation details along with user's email and last update time
-    res.status(200).json({ 
+    res.status(200).json({
       _id: conversation._id,
       email: conversation.userId.email,
       lastUpdated: lastMessage.updatedAt
