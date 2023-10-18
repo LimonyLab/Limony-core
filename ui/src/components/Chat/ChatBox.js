@@ -35,9 +35,13 @@ function ChatBox() {
   const { currentUser } = useAuth();
   const [receiver, setReceiver] = useState('');
 
+  console.log('In the begining, we have our conversationId as: ')
+  console.log(conversationId);
+
   const navigate = useNavigate(); // Initialize useNavigate
 
   if (conversationId === undefined) {
+    console.log('line 41, ', currentUser);
     conversationId = currentUser.conversationId;
   }
 
@@ -83,7 +87,7 @@ function ChatBox() {
 
   useEffect(() => {
     if (receiver && currentUser) {
-      ws = new WebSocket(`ws://chat.limonylab.com/chat-socket?conversationId=${conversationId}&senderId=${currentUser.id}&senderName=${currentUser.name}`);
+      ws = new WebSocket(`wss://chat.limonylab.com/chat-socket?conversationId=${conversationId}&senderId=${currentUser.id}&senderName=${currentUser.name}`);
 
       ws.onopen = () => {
         // Connection is opened
