@@ -24,13 +24,6 @@ exports.register = async (req, res) => {
 
           user.password = await bcrypt.hash(user.password, 10);
 
-          try {
-            await user.save();
-            logger.info(`User registered: ${user.email}`);
-          } catch (err) {
-            logger.error('Error saving user:', err);
-            return res.status(500).json({ message: 'Error saving user to the database.' });
-          }
 
           console.log(29);
           // Create a new conversation when a user registers
@@ -47,6 +40,13 @@ exports.register = async (req, res) => {
 
 
 
+          try {
+            await user.save();
+            logger.info(`User registered: ${user.email}`);
+          } catch (err) {
+            logger.error('Error saving user:', err);
+            return res.status(500).json({ message: 'Error saving user to the database.' });
+          }
 
           const email = {
             from: 'LimonyAssistant@gmail.com',

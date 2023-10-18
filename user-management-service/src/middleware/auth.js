@@ -70,7 +70,7 @@ const roleAuth = async (req, res, next) => {
   }
   const userRole = req.user.role;
   const route = req.originalUrl;
-  
+
   if (!routesToRoles[route] || !routesToRoles[route].includes(userRole)) {
     logger.error('Not authorized to access this resource ...');
     return res.status(403).send({ error: 'Not authorized to access this resource' });
@@ -88,16 +88,16 @@ const roleAuth = async (req, res, next) => {
 const chatPathAuth = async (req, res, next) => {
   const user = req.user;
   const conversationId = req.params.conversationId;
-    console.log('Conversation is: ', conversation);
+  console.log('Conversation is: ', conversation);
 
   const conversation = await Conversation.findById(conversationId);
-  
+
   console.log('Conversation is: ', conversation);
   if (conversation.userId.toString() !== user._id.toString()) {
     logger.error('Not authorized to access this chat');
     return res.status(403).send({ error: 'Not authorized to access this chat' });
   }
-  
+
   next();
 };
 
