@@ -1,6 +1,6 @@
-// src/components/Chat/OtherMessage.js
 import React from 'react';
 import styled from 'styled-components';
+import ReactMarkdown from 'react-markdown';
 
 const MessageContainer = styled.div`
   display: flex;
@@ -12,7 +12,7 @@ const MessageContainer = styled.div`
   padding: 10px;
 `;
 
-const MessageContent = styled.p`
+const MessageContent = styled.div`  // Note: Changed from styled.p to styled.div to better support markdown content
   font-size: 17px;
   color: white;
 `;
@@ -26,7 +26,11 @@ const MessageDetails = styled.p`
 function OtherMessage({ content, senderId, senderName, createdAt }) {
   return (
     <MessageContainer>
-      <MessageContent>{content}</MessageContent>
+      <MessageContent>
+        <ReactMarkdown>
+          {content}
+        </ReactMarkdown>
+      </MessageContent>
       <MessageDetails>{senderName} at {new Date(createdAt).toLocaleTimeString()}</MessageDetails>
     </MessageContainer>
   );
