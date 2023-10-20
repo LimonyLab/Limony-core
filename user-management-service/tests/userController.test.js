@@ -6,27 +6,27 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 const User = require('../src/models/User');
 const userController = require('../src/controllers/userController');
 
-app.use(express.json()); 
+app.use(express.json());
 app.post('/users/register', userController.register);
 
 let mongoServer;
 
 beforeAll(async () => {
-    mongoServer = new MongoMemoryServer();
-    await mongoServer.start();
-    const mongoUri = await mongoServer.getUri();
-    try {
-      await mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
-    } catch (err) {
-      console.error(err);
-    }
-  });
+  mongoServer = new MongoMemoryServer();
+  await mongoServer.start();
+  const mongoUri = await mongoServer.getUri();
+  try {
+    await mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
+  } catch (err) {
+    console.error(err);
+  }
+});
 
 afterAll(async () => {
-await mongoose.connection.close();
-await mongoServer.stop();
+  await mongoose.connection.close();
+  await mongoServer.stop();
 });
-  
+
 
 test('POST /users/register - success', async () => {
   const res = await request(app)
