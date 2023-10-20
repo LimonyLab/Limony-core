@@ -14,7 +14,7 @@ const MessageSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-}, { timestamps: true }); // enables automatic createdAt and updatedAt fields
+}, { timestamps: true });
 
 
 const ConversationSchema = new Schema({

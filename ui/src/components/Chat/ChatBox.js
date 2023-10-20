@@ -69,11 +69,9 @@ function ChatBox() {
       }
     })
       .then(response => {
+
         setMessages(response.data.conversation);
-        console.log("The following is our conversation...: ")
-        console.log(response.data.conversation);
-        console.log("Lets look at response.data: ", response.data);
-        console.log("Lets look at currentUser: ", currentUser);
+
         if (response.data.userId === currentUser.id) {
           setReceiver("supervisor@supervisor.com");
         } else {
@@ -99,8 +97,6 @@ function ChatBox() {
       };
 
       ws.onmessage = (message) => {
-        console.log("New message is:::: ")
-        console.log(message);
         const newMessage = JSON.parse(message.data);
         newMessage.createdAt = new Date();
         setMessages((prevMessages) => [...prevMessages, newMessage]);
@@ -134,8 +130,7 @@ function ChatBox() {
       conversationId: conversationId,
       content: messageContent,
     };
-    ws.send(JSON.stringify(message));
-
+    let res = ws.send(JSON.stringify(message));
     // Optimistically adding the new message to the UI here
     const newUIMessage = {
       content: messageContent,
