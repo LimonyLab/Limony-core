@@ -69,11 +69,9 @@ function ChatBox() {
       }
     })
       .then(response => {
+
         setMessages(response.data.conversation);
-        console.log("The following is our conversation...: ")
-        console.log(response.data.conversation);
-        console.log("Lets look at response.data: ", response.data);
-        console.log("Lets look at currentUser: ", currentUser);
+
         if (response.data.userId === currentUser.id) {
           setReceiver("supervisor@supervisor.com");
         } else {
@@ -99,8 +97,6 @@ function ChatBox() {
       };
 
       ws.onmessage = (message) => {
-        console.log("New message is:::: ")
-        console.log(message);
         const newMessage = JSON.parse(message.data);
         newMessage.createdAt = new Date();
         setMessages((prevMessages) => [...prevMessages, newMessage]);
@@ -129,13 +125,17 @@ function ChatBox() {
 
 
   const handleSend = (messageContent) => {
+    // Check if the message content is empty or only contains whitespaces
+    if (!messageContent.trim()) {
+      return;
+    }
+
     // Sending a new message using the WebSocket connection
     const message = {
       conversationId: conversationId,
       content: messageContent,
     };
-    ws.send(JSON.stringify(message));
-
+    let res = ws.send(JSON.stringify(message));
     // Optimistically adding the new message to the UI here
     const newUIMessage = {
       content: messageContent,
@@ -150,6 +150,7 @@ function ChatBox() {
 
   return (
     <ChatContainer>
+
       <MessagesContainer>
         {messages.map((message, index) =>
           message.senderId === currentUser.id
@@ -162,7 +163,6 @@ function ChatBox() {
       <SendMessageForm onSend={handleSend} />
     </ChatContainer>
   );
-
 }
 
 export default ChatBox;

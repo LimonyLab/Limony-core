@@ -38,12 +38,15 @@ const HeaderAndDrawer = ({ children }) => {
 
 
     useEffect(() => {
+        document.title = "Limony Assistant";
         checkAndReactToTokenValidity();
         if (currentUser && isTokenValid()) {
             if (currentUser.role === 'supervisor') {
                 setNavItems(['Supervisor Dashboard']);
             } else {
-                setNavItems(['Chat', 'Dashboard']);
+                // Removing the Dashboard that is not really ready right now!
+                // setNavItems(['Chat', 'Dashboard']);
+                setNavItems(['Chat']);
             }
 
         }
