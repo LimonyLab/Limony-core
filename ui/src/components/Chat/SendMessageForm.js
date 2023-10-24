@@ -9,13 +9,14 @@ const Form = styled.form`
 
 const Input = styled.input`
   flex-grow: 1;
-  border: none;
+  border: 1px solid rgb(0, 123, 255);
   border-radius: 4px;
   padding: 0.5em;
   margin-right: 0.5em;
   width: 100%;
-  height: 40px;
+  height: 50px;
   box-shadow: 0px 0px 5px rgba(0,0,0,0.1);
+  font-size: 16px;
 `;
 
 const Button = styled.button`
@@ -43,10 +44,10 @@ function SendMessageForm({ onSend }) {
 
   return (
     <Form onSubmit={handleSubmit}>
-      <Input 
-        type="text" 
-        value={message} 
-        onChange={(e) => setMessage(e.target.value)} 
+      <Input
+        type="text"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
         placeholder="Type your message..."
       />
       <Button type="submit">Send</Button>

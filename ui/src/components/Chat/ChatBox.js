@@ -125,6 +125,11 @@ function ChatBox() {
 
 
   const handleSend = (messageContent) => {
+    // Check if the message content is empty or only contains whitespaces
+    if (!messageContent.trim()) {
+      return;
+    }
+
     // Sending a new message using the WebSocket connection
     const message = {
       conversationId: conversationId,
@@ -145,6 +150,7 @@ function ChatBox() {
 
   return (
     <ChatContainer>
+
       <MessagesContainer>
         {messages.map((message, index) =>
           message.senderId === currentUser.id
@@ -157,7 +163,6 @@ function ChatBox() {
       <SendMessageForm onSend={handleSend} />
     </ChatContainer>
   );
-
 }
 
 export default ChatBox;

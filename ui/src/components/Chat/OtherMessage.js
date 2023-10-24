@@ -9,7 +9,7 @@ const MessageContainer = styled.div`
   margin: 10px 0;
   background-color: #1976d2;
   border-radius: 5px;
-  padding: 10px;
+  padding-left: 10px;
 `;
 
 const MessageContent = styled.div`  // Note: Changed from styled.p to styled.div to better support markdown content
