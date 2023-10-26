@@ -112,6 +112,8 @@ let getAllConversations = async (req, res) => {
       .lean() // convert mongoose document to JS object to allow adding the lastUpdated field
       .exec(); // execute the query
 
+    console.log("These are all the conversations found: :)")
+    console.log(conversations)
     // loop over conversations and add the lastUpdated field
     conversations.forEach(conversation => {
       if (conversation.messages.length != 0) {
