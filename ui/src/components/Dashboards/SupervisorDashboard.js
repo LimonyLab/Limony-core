@@ -71,7 +71,6 @@ function SupervisorDashboard() {
   }, []);
 
   const handleChatSelect = (conversationId) => {
-    console.log('72');
     // Navigate to the chat page with the selected conversationId
     navigate(`/chat/${conversationId}`);
   };
