@@ -31,13 +31,6 @@ const Register = () => {
         profile: {
             name: "",
             age: null
-        },
-        healthInfo: {
-            bloodPressure: {
-                systolic: null,
-                diastolic: null
-            },
-            overallHealthStatus: ""
         }
     });
 
@@ -96,13 +89,6 @@ const Register = () => {
                     profile: {
                         name: "",
                         age: null
-                    },
-                    healthInfo: {
-                        bloodPressure: {
-                            systolic: null,
-                            diastolic: null
-                        },
-                        overallHealthStatus: ""
                     }
                 }); // Resetting the form to initial state
             }
@@ -169,39 +155,6 @@ const Register = () => {
                                 fullWidth
                                 label="Age"
                                 type="number"
-                                onChange={handleChange}
-                            />
-                        </Grid>
-                        <Grid item xs={6}>
-                            <TextField
-                                name="healthInfo.bloodPressure.systolic"
-                                variant="outlined"
-                                required
-                                fullWidth
-                                label="Systolic"
-                                type="number"
-                                onChange={handleChange}
-                            />
-                        </Grid>
-                        <Grid item xs={6}>
-                            <TextField
-                                name="healthInfo.bloodPressure.diastolic"
-                                variant="outlined"
-                                required
-                                fullWidth
-                                label="Diastolic"
-                                type="number"
-                                onChange={handleChange}
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextField
-                                name="healthInfo.overallHealthStatus"
-                                variant="outlined"
-                                required
-                                fullWidth
-                                label="Overall Health Status"
-                                type="text"
                                 onChange={handleChange}
                             />
                         </Grid>
