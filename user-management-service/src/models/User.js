@@ -4,26 +4,18 @@ const { Schema } = mongoose;
 
 const UserSchema = new Schema({
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true }, 
+  password: { type: String, required: true },
   tokens: [{
     token: {
       type: String,
       required: true
     }
   }],
-  role: { type: String, default: 'employee' }, 
+  role: { type: String, default: 'employee' },
   conversationId: { type: String },
   profile: {
     name: { type: String, required: true },
     age: { type: Number, required: true },
-    // Let's add more fields to here later
-  },
-  healthInfo: {
-    bloodPressure: {
-      systolic: { type: Number },
-      diastolic: { type: Number },
-    },
-    overallHealthStatus: { type: String },
     // Let's add more fields to here later
   },
   createdAt: { type: Date, default: Date.now },
