@@ -142,7 +142,7 @@ const Register = () => {
                                 variant="outlined"
                                 required
                                 fullWidth
-                                label="Name"
+                                label="Full Name"
                                 type="text"
                                 onChange={handleChange}
                             />
