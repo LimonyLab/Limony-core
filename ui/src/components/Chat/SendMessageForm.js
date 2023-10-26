@@ -33,6 +33,21 @@ const Button = styled.button`
   }
 `;
 
+const Textarea = styled.textarea`
+  flex-grow: 1;
+  border: 1px solid rgb(0, 123, 255);
+  border-radius: 4px;
+  padding: 0.5em;
+  margin-right: 0.5em;
+  width: 100%;
+  height: 50px;
+  box-shadow: 0px 0px 5px rgba(0,0,0,0.1);
+  font-size: 16px;
+  resize: vertical; // Allows users to resize the textarea vertically
+`;
+
+
+
 function SendMessageForm({ onSend }) {
   const [message, setMessage] = useState('');
 
@@ -44,8 +59,7 @@ function SendMessageForm({ onSend }) {
 
   return (
     <Form onSubmit={handleSubmit}>
-      <Input
-        type="text"
+      <Textarea
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         placeholder="Type your message..."
